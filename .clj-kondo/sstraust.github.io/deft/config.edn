@@ -1,0 +1,9 @@
+{:hooks
+ {:macroexpand
+  {
+   deft.core/deft deft/deft
+   deft.core/witht deft/witht
+   deft.core/defp deft/defp
+   deft.core/defnt deft/defnt
+
+   }}}

@@ -1,0 +1,5 @@
+{:paths ["src"]
+ :deps  {org.clojure/clojurescript {:mvn/version "1.11.54"}
+         org.clojure/clojure {:mvn/version "1.12.0"}
+         potemkin/potemkin {:mvn/version "0.4.6"}
+         metosin/malli {:mvn/version "0.17.0"}}}
