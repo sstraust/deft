@@ -124,3 +124,21 @@
       (deftest-external-ns-helper/my-external-method [this] "wowza"))
     (is (= (deftest-external-ns-helper/my-external-method (>Wowza12Impl))
            "wowza"))))
+
+
+
+
+;; you need to add these 3 tests into your test suite, and then you are
+;; cruiiiiiiising
+(def hello 3)
+
+(deft MyClass [hello])
+
+(witht [MyClass (>MyClass :hello "hi") :allow-overrides [] :skip-fields [hello]]
+  hello)
+
+(witht [MyClass (>MyClass :hello "hi") :allow-overrides [] :skip-fields []]
+  hello)
+
+(witht [MyClass (>MyClass :hello "hi") :allow-overrides [hello] :skip-fields []]
+  hello)

@@ -154,13 +154,35 @@
                (drop-while seq? everything-after-kwds)))
       ret)))
 
+
 (defmacro witht [def-list & code]
-  (let [[class-name var-name] def-list]
+  (let [[class-name var-name  & {:keys [allow-overrides skip-fields]}] def-list
+        allow-override-set (set allow-overrides)
+        skip-fields-set (set skip-fields)]
+    (doseq [class-field (get @defc-fields-map
+                             (symbol (resolve class-name)))]
+      (let [var-name (symbol (str (namespace (symbol (resolve class-name))))
+                             (str class-field))]
+        (when (and (not (contains? allow-override-set class-field))
+                   (not (contains? skip-fields-set class-field))
+                   (resolve var-name))
+          (throw (RuntimeException.
+                  (str "witht cannot redefine an existing var.\n\n"
+                       " the variable " class-field " is defined somewhere else in your environment."
+                       " we don't let you override existing binding using deft, so that you don't accidentally"
+                       " run into surprises when you add new field-names to an existing class."
+                       " you can opt out of this by adding"
+"\n(witht [YourClass your-var :allow-override [your-field-name]]
+   ....
+)"))))))
+                             
     `(let [{~(keyword (namespace (symbol (resolve class-name))) (name :keys))
-            ~(get @defc-fields-map
+            ~(into [] (remove
+              (fn [x] (contains? skip-fields-set x))
+              (get @defc-fields-map
                       ;; does this happen at read time?
                       ;; you have to be careful with the resolves
-                      (symbol (resolve class-name)))}
+                      (symbol (resolve class-name)))))}
          ~var-name]
        ~@code)))
 
