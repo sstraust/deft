@@ -176,31 +176,31 @@ If you want to implement a method that is defined externally to the protocol, yo
    (draw-stuff/draw [this] (draw this)))
 ```
 
-#### extendt (under development)
-Lets you extend a type definition. Works the same way as the implementations block of deft.
-```clojure
-(extendt Shape Circle
-   (area [this] (* PI r r)))
-```
+<!-- #### extendt (under development) -->
+<!-- Lets you extend a type definition. Works the same way as the implementations block of deft. -->
+<!-- ```clojure -->
+<!-- (extendt Shape Circle -->
+<!--    (area [this] (* PI r r))) -->
+<!-- ``` -->
 
-#### listp  (under development)
-Describes what protocols were implemented for a given type
-
-
-#### defnt  (not yet ready)
-Convenience function for defn + witht
-```clojure
-(defnt diameter [circle] Circle
-   (* 2 pi radius))
-```
+<!-- #### listp  (under development) -->
+<!-- Describes what protocols were implemented for a given type -->
 
 
-#### defmethodt (under development)
-Convenience function for defmethod + witht
-```clojure
-(defmethodt area Circle [circle]
-   (* pi radius radius))
-```
+<!-- #### defnt  (not yet ready) -->
+<!-- Convenience function for defn + witht -->
+<!-- ```clojure -->
+<!-- (defnt diameter [circle] Circle -->
+<!--    (* 2 pi radius)) -->
+<!-- ``` -->
+
+
+<!-- #### defmethodt (under development) -->
+<!-- Convenience function for defmethod + witht -->
+<!-- ```clojure -->
+<!-- (defmethodt area Circle [circle] -->
+<!--    (* pi radius radius)) -->
+<!-- ``` -->
 
 ##### Why use different syntax ordering for defmethodt and defnt?
 In defmethod, Circle is also the dispatch value, so it describes what *type* of thing you're defining, and is in some sense part of the _name_ of what you are trying to implement. In defnt, the fact that you're using Circle destructuring under the hood is an implementation detail, and so it belongs with the argument list (and after any docstrings). I know it seems strange to have two styles, but I thought long and hard about this, and decided this was the best approach for code readability, especially for scanning large existing files to see how they work.

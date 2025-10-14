@@ -126,19 +126,20 @@
            "wowza"))))
 
 
+;; Test 13
+(deftest external-refs-test
+  (testing "Verify that external references behave as expected when using witht"
+    (def hello13 3)
+    (deft MyClass13 [hello13])
 
+    (is (thrown? Exception
+                 (macroexpand-1 '(witht [MyClass13 (>MyClass13 :hello "hi")]
+                                   hello))))
 
-;; you need to add these 3 tests into your test suite, and then you are
-;; cruiiiiiiising
-(def hello 3)
+    (is (= (witht [MyClass13 (>MyClass13 :hello13 "hi") :allow-overrides [] :skip-fields [hello13]]
+             hello13)
+           3))
 
-(deft MyClass [hello])
-
-(witht [MyClass (>MyClass :hello "hi") :allow-overrides [] :skip-fields [hello]]
-  hello)
-
-(witht [MyClass (>MyClass :hello "hi") :allow-overrides [] :skip-fields []]
-  hello)
-
-(witht [MyClass (>MyClass :hello "hi") :allow-overrides [hello] :skip-fields []]
-  hello)
+    (is (= (witht [MyClass13 (>MyClass13 :hello13 "hi") :allow-overrides [hello13] :skip-fields []]
+             hello13)
+           "hi"))))
