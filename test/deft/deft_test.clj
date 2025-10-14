@@ -124,3 +124,22 @@
       (deftest-external-ns-helper/my-external-method [this] "wowza"))
     (is (= (deftest-external-ns-helper/my-external-method (>Wowza12Impl))
            "wowza"))))
+
+
+;; Test 13
+(deftest external-refs-test
+  (testing "Verify that external references behave as expected when using witht"
+    (def hello13 3)
+    (deft MyClass13 [hello13])
+
+    (is (thrown? Exception
+                 (macroexpand-1 '(witht [MyClass13 (>MyClass13 :hello "hi")]
+                                   hello))))
+
+    (is (= (witht [MyClass13 (>MyClass13 :hello13 "hi") :allow-overrides [] :skip-fields [hello13]]
+             hello13)
+           3))
+
+    (is (= (witht [MyClass13 (>MyClass13 :hello13 "hi") :allow-overrides [hello13] :skip-fields []]
+             hello13)
+           "hi"))))
