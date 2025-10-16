@@ -118,7 +118,7 @@ Example:
 (defp Shape
    (area [this]))
    
-(defp Circle [r]
+(deft Circle [r]
    Shape
    (area [this] (* PI r r)))
 ```
