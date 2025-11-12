@@ -17,3 +17,5 @@ www
 .hg/
 .cpcache
 .lsp/.cache
+examplesjs/out
+examplesjs/node_modules

@@ -133,7 +133,7 @@
     (deft MyClass13 [hello13])
 
     (is (thrown? Exception
-                 (macroexpand-1 '(witht [MyClass13 (>MyClass13 :hello13 "hi")]
+                 (eval  '(witht [MyClass13 (>MyClass13 :hello13 "hi")]
                                    hello13))))
     
 
