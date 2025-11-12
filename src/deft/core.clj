@@ -4,11 +4,6 @@
             [cljs.analyzer.api :as api]))
 
 
-(defmacro my-resolve [env field]
-  (if (:ns &env)
-    `(:name (api/resolve ~env ~field))
-    `(resolve ~field)))
-
 (defmacro defp
   "Define a (defp) protocol, which is essentially a list of multimethods.
 
@@ -141,11 +136,9 @@
 
     (doseq [class-field (get @defc-fields-map
                              (symbol
-                              ;; (my-resolve &env class-name)
                               (if (:ns &env)
                                 (:name (api/resolve &env class-name))
                                 (resolve class-name))
-                              ;; (my-resolve class-name)
                               ))]
       (let [var-name (symbol (str (namespace (symbol
                                               (if (:ns &env)
@@ -156,9 +149,7 @@
                    (not (contains? skip-fields-set class-field))
                    (if (:ns &env)
                      (:name (api/resolve &env var-name))
-                     (resolve var-name))
-                   ;; (my-resolve var-name)
-                   )
+                     (resolve var-name)))
           (throw (RuntimeException.
                   (str "witht cannot redefine an existing var.\n\n"
                        " the variable " class-field " is defined somewhere else in your environment."
@@ -187,7 +178,6 @@
 (defn get-method-impl-name-clj [interface-name impl]
   (if (qualified-symbol? (first impl))
     (first impl)
-    ;; need to carefully figure this out
     (symbol (str (.ns (resolve interface-name)))
             (str (first impl)))))
 
