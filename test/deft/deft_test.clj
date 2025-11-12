@@ -1,4 +1,4 @@
-(ns spicyclojuremacros.deft-test
+(ns deft.deft-test
   (:require
    [clojure.test :refer :all]
    [deft.core :refer :all :as deft]
@@ -66,12 +66,12 @@
              (>DissocCircle :position [3 4]
                             :radius 4)
              :wowza))
-           :spicyclojuremacros.deft-test/DissocCircle))
+           :deft.deft-test/DissocCircle))
     (is (= (type
             (dissoc 
              (>DissocCircle :position [3 4]
                             :radius 4)))
-           :spicyclojuremacros.deft-test/DissocCircle))
+           :deft.deft-test/DissocCircle))
     (is (= (type
             (dissoc 
              (>DissocCircle :position [3 4]
