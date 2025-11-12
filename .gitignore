@@ -17,3 +17,8 @@ www
 .hg/
 .cpcache
 .lsp/.cache
+examples/out
+examples/node_modules
+examples/.shadow-cljs
+.DS_Store
+.#*

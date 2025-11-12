@@ -1,0 +1,24 @@
+{
+ :deps true
+ :builds {:app
+          {
+           :devtools {
+                      :autobuild true
+                      }
+           :output-dir "out"
+           :target :browser
+           :modules {:main {:init-fn examples.core/load-page}}
+           }
+          :prod {
+                 :output-dir "prod_js"
+                 :target :browser
+                 :modules {:main {:init-fn examples.core/load-page}}
+                 }
+          :test {
+                 :target :node-test  
+                 :output-to "out/node-test.js"
+                 :ns-regexp ".*-test$"
+                 }
+          }
+ 
+ }

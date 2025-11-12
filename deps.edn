@@ -2,4 +2,10 @@
  :deps  {org.clojure/clojurescript {:mvn/version "1.11.54"}
          org.clojure/clojure {:mvn/version "1.12.0"}
          potemkin/potemkin {:mvn/version "0.4.6"}
-         metosin/malli {:mvn/version "0.17.0"}}}
+         metosin/malli {:mvn/version "0.17.0"}}
+ :aliases
+ {:test {:extra-paths ["test"]
+         :extra-deps {io.github.cognitect-labs/test-runner 
+                      {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+         :main-opts ["-m" "cognitect.test-runner"]
+         :exec-fn cognitect.test-runner.api/test}}}

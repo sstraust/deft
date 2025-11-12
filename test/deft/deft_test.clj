@@ -1,4 +1,4 @@
-(ns spicyclojuremacros.deft-test
+(ns deft.deft-test
   (:require
    [clojure.test :refer :all]
    [deft.core :refer :all :as deft]
@@ -66,12 +66,12 @@
              (>DissocCircle :position [3 4]
                             :radius 4)
              :wowza))
-           :spicyclojuremacros.deft-test/DissocCircle))
+           :deft.deft-test/DissocCircle))
     (is (= (type
             (dissoc 
              (>DissocCircle :position [3 4]
                             :radius 4)))
-           :spicyclojuremacros.deft-test/DissocCircle))
+           :deft.deft-test/DissocCircle))
     (is (= (type
             (dissoc 
              (>DissocCircle :position [3 4]
@@ -133,8 +133,9 @@
     (deft MyClass13 [hello13])
 
     (is (thrown? Exception
-                 (macroexpand-1 '(witht [MyClass13 (>MyClass13 :hello "hi")]
-                                   hello))))
+                 (eval  '(witht [MyClass13 (>MyClass13 :hello13 "hi")]
+                                   hello13))))
+    
 
     (is (= (witht [MyClass13 (>MyClass13 :hello13 "hi") :allow-overrides [] :skip-fields [hello13]]
              hello13)
@@ -143,3 +144,8 @@
     (is (= (witht [MyClass13 (>MyClass13 :hello13 "hi") :allow-overrides [hello13] :skip-fields []]
              hello13)
            "hi"))))
+
+
+
+
+
