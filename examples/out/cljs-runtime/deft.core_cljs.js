@@ -125,8 +125,8 @@ return cljs.core.reduce.cljs$core$IFn$_invoke$arity$3(cljs.core._conj,(new deft.
 (deft.core_cljs.TypeMap.prototype.call = (function (unused__11803__auto__){
 var self__ = this;
 var self__ = this;
-var G__47042 = (arguments.length - (1));
-switch (G__47042) {
+var G__45541 = (arguments.length - (1));
+switch (G__45541) {
 case (1):
 return self__.cljs$core$IFn$_invoke$arity$1((arguments[(1)]));
 
@@ -141,10 +141,10 @@ throw (new Error(["Invalid arity: ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(
 }
 }));
 
-(deft.core_cljs.TypeMap.prototype.apply = (function (self__,args47041){
+(deft.core_cljs.TypeMap.prototype.apply = (function (self__,args45540){
 var self__ = this;
 var self____$1 = this;
-return self____$1.call.apply(self____$1,[self____$1].concat(cljs.core.aclone(args47041)));
+return self____$1.call.apply(self____$1,[self____$1].concat(cljs.core.aclone(args45540)));
 }));
 
 (deft.core_cljs.TypeMap.prototype.cljs$core$IFn$_invoke$arity$1 = (function (k){
@@ -198,14 +198,14 @@ return (new deft.core_cljs.TypeMap(m,mta));
  */
 deft.core_cljs.check_implements = (function deft$core_cljs$check_implements(var_args){
 var args__5772__auto__ = [];
-var len__5766__auto___47051 = arguments.length;
-var i__5767__auto___47052 = (0);
+var len__5766__auto___45551 = arguments.length;
+var i__5767__auto___45552 = (0);
 while(true){
-if((i__5767__auto___47052 < len__5766__auto___47051)){
-args__5772__auto__.push((arguments[i__5767__auto___47052]));
+if((i__5767__auto___45552 < len__5766__auto___45551)){
+args__5772__auto__.push((arguments[i__5767__auto___45552]));
 
-var G__47053 = (i__5767__auto___47052 + (1));
-i__5767__auto___47052 = G__47053;
+var G__45553 = (i__5767__auto___45552 + (1));
+i__5767__auto___45552 = G__45553;
 continue;
 } else {
 }
@@ -216,17 +216,17 @@ var argseq__5773__auto__ = ((((2) < args__5772__auto__.length))?(new cljs.core.I
 return deft.core_cljs.check_implements.cljs$core$IFn$_invoke$arity$variadic((arguments[(0)]),(arguments[(1)]),argseq__5773__auto__);
 });
 
-(deft.core_cljs.check_implements.cljs$core$IFn$_invoke$arity$variadic = (function (obj_type,protocol,p__47046){
-var map__47047 = p__47046;
-var map__47047__$1 = cljs.core.__destructure_map(map__47047);
-var available_methods = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__47047__$1,new cljs.core.Keyword(null,"available-methods","available-methods",-1544493540));
+(deft.core_cljs.check_implements.cljs$core$IFn$_invoke$arity$variadic = (function (obj_type,protocol,p__45545){
+var map__45546 = p__45545;
+var map__45546__$1 = cljs.core.__destructure_map(map__45546);
+var available_methods = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__45546__$1,new cljs.core.Keyword(null,"available-methods","available-methods",-1544493540));
 var available_methods__$1 = (cljs.core.truth_(available_methods)?cljs.core.set(available_methods):null);
-var undefined_methods = cljs.core.into.cljs$core$IFn$_invoke$arity$2(cljs.core.PersistentVector.EMPTY,cljs.core.remove.cljs$core$IFn$_invoke$arity$2(cljs.core.nil_QMARK_,cljs.core.map.cljs$core$IFn$_invoke$arity$2((function (p__47048){
-var map__47049 = p__47048;
-var map__47049__$1 = cljs.core.__destructure_map(map__47049);
-var method_def = map__47049__$1;
-var key_fn = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__47049__$1,new cljs.core.Keyword("deft.core-cljs","key-fn","deft.core-cljs/key-fn",965121620));
-var multimethod = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__47049__$1,new cljs.core.Keyword("deft.core-cljs","multimethod","deft.core-cljs/multimethod",-1379489319));
+var undefined_methods = cljs.core.into.cljs$core$IFn$_invoke$arity$2(cljs.core.PersistentVector.EMPTY,cljs.core.remove.cljs$core$IFn$_invoke$arity$2(cljs.core.nil_QMARK_,cljs.core.map.cljs$core$IFn$_invoke$arity$2((function (p__45547){
+var map__45548 = p__45547;
+var map__45548__$1 = cljs.core.__destructure_map(map__45548);
+var method_def = map__45548__$1;
+var key_fn = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__45548__$1,new cljs.core.Keyword("deft.core-cljs","key-fn","deft.core-cljs/key-fn",965121620));
+var multimethod = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__45548__$1,new cljs.core.Keyword("deft.core-cljs","multimethod","deft.core-cljs/multimethod",-1379489319));
 if(cljs.core.truth_((function (){var or__5043__auto__ = (!(cljs.core.contains_QMARK_(cljs.core.methods$(multimethod),(key_fn.cljs$core$IFn$_invoke$arity$1 ? key_fn.cljs$core$IFn$_invoke$arity$1(obj_type) : key_fn.call(null, obj_type)))));
 if(or__5043__auto__){
 return or__5043__auto__;
@@ -254,13 +254,13 @@ return true;
 (deft.core_cljs.check_implements.cljs$lang$maxFixedArity = (2));
 
 /** @this {Function} */
-(deft.core_cljs.check_implements.cljs$lang$applyTo = (function (seq47043){
-var G__47044 = cljs.core.first(seq47043);
-var seq47043__$1 = cljs.core.next(seq47043);
-var G__47045 = cljs.core.first(seq47043__$1);
-var seq47043__$2 = cljs.core.next(seq47043__$1);
+(deft.core_cljs.check_implements.cljs$lang$applyTo = (function (seq45542){
+var G__45543 = cljs.core.first(seq45542);
+var seq45542__$1 = cljs.core.next(seq45542);
+var G__45544 = cljs.core.first(seq45542__$1);
+var seq45542__$2 = cljs.core.next(seq45542__$1);
 var self__5751__auto__ = this;
-return self__5751__auto__.cljs$core$IFn$_invoke$arity$variadic(G__47044,G__47045,seq47043__$2);
+return self__5751__auto__.cljs$core$IFn$_invoke$arity$variadic(G__45543,G__45544,seq45542__$2);
 }));
 
 deft.core_cljs.prefix_keys = (function deft$core_cljs$prefix_keys(ns_name,m){
