@@ -86,6 +86,10 @@
      (-pr-writer [_ writer opts]
        (-write writer "#deft.core.TypeMap")
        (-write writer (pr-str {:m m :mta mta})))
+
+     IKVReduce
+     (-kv-reduce [_ f init]
+       (reduce (fn [ret [k v]] (f ret k v)) init m))
      
      ;; IFn for map-as-function behavior: (my-map :key)
      IFn
