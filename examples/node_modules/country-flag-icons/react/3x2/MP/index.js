@@ -1,1 +1,0 @@
-export { MP as default } from '../index.js'

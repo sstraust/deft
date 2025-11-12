@@ -1,1 +1,0 @@
-export { IM as default } from '../index.js'

@@ -1,1 +1,0 @@
-export { GR as default } from '../index.js'

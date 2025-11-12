@@ -1,1 +1,0 @@
-export { PH as default } from '../index.js'

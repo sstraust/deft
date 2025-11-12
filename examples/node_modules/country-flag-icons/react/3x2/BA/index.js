@@ -1,1 +1,0 @@
-export { BA as default } from '../index.js'

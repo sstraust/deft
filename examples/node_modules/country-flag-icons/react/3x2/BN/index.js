@@ -1,1 +1,0 @@
-export { BN as default } from '../index.js'

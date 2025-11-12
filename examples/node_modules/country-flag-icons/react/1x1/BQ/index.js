@@ -1,1 +1,0 @@
-export { BQ as default } from '../index.js'

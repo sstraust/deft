@@ -1,1 +1,0 @@
-export { BG as default } from '../index.js'

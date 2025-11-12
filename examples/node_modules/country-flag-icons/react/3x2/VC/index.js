@@ -1,1 +1,0 @@
-export { VC as default } from '../index.js'

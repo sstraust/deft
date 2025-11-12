@@ -1,1 +1,0 @@
-export { FK as default } from '../index.js'

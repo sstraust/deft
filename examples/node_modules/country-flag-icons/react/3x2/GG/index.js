@@ -1,1 +1,0 @@
-export { GG as default } from '../index.js'

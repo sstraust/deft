@@ -1,1 +1,0 @@
-export { DM as default } from '../index.js'

@@ -1,1 +1,0 @@
-export { TC as default } from '../index.js'

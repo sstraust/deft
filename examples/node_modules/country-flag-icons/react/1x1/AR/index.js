@@ -1,1 +1,0 @@
-export { AR as default } from '../index.js'

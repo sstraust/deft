@@ -1,1 +1,0 @@
-export { MN as default } from '../index.js'

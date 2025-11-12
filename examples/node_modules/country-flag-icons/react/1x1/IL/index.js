@@ -1,1 +1,0 @@
-export { IL as default } from '../index.js'

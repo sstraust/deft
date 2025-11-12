@@ -1,1 +1,0 @@
-export { NI as default } from '../index.js'

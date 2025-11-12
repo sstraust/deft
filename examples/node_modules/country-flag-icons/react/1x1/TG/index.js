@@ -1,1 +1,0 @@
-export { TG as default } from '../index.js'

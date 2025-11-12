@@ -1,1 +1,0 @@
-export { TZ as default } from '../index.js'

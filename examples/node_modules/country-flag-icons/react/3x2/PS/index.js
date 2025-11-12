@@ -1,1 +1,0 @@
-export { PS as default } from '../index.js'

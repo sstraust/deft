@@ -1,1 +1,0 @@
-export { VI as default } from '../index.js'

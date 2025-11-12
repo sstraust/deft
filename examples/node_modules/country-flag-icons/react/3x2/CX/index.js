@@ -1,1 +1,0 @@
-export { CX as default } from '../index.js'

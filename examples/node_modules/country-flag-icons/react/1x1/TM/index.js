@@ -1,1 +1,0 @@
-export { TM as default } from '../index.js'

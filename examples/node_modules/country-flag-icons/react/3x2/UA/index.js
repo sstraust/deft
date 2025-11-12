@@ -1,1 +1,0 @@
-export { UA as default } from '../index.js'

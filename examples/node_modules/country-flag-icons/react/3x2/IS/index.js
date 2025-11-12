@@ -1,1 +1,0 @@
-export { IS as default } from '../index.js'

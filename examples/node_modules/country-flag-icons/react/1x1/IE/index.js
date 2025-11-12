@@ -1,1 +1,0 @@
-export { IE as default } from '../index.js'

@@ -1,1 +1,0 @@
-export { JO as default } from '../index.js'

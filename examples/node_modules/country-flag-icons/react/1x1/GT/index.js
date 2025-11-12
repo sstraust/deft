@@ -1,1 +1,0 @@
-export { GT as default } from '../index.js'

@@ -1,1 +1,0 @@
-export { SL as default } from '../index.js'

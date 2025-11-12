@@ -1,1 +1,0 @@
-export { ZA as default } from '../index.js'

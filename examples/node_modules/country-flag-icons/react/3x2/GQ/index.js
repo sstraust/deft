@@ -1,1 +1,0 @@
-export { GQ as default } from '../index.js'

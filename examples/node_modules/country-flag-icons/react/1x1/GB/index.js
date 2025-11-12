@@ -1,1 +1,0 @@
-export { GB as default } from '../index.js'

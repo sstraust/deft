@@ -1,1 +1,0 @@
-export { PW as default } from '../index.js'

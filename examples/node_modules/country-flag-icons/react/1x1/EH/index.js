@@ -1,1 +1,0 @@
-export { EH as default } from '../index.js'

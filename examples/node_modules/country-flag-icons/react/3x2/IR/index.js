@@ -1,1 +1,0 @@
-export { IR as default } from '../index.js'

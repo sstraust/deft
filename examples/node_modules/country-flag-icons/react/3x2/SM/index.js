@@ -1,1 +1,0 @@
-export { SM as default } from '../index.js'

@@ -1,1 +1,0 @@
-export { BB as default } from '../index.js'

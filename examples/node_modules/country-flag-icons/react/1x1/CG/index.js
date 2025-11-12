@@ -1,1 +1,0 @@
-export { CG as default } from '../index.js'

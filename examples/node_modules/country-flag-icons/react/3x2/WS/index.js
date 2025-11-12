@@ -1,1 +1,0 @@
-export { WS as default } from '../index.js'

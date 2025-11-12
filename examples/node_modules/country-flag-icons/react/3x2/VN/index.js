@@ -1,1 +1,0 @@
-export { VN as default } from '../index.js'

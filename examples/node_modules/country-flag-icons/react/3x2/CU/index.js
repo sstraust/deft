@@ -1,1 +1,0 @@
-export { CU as default } from '../index.js'

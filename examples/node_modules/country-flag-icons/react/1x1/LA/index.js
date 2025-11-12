@@ -1,1 +1,0 @@
-export { LA as default } from '../index.js'

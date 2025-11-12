@@ -1,1 +1,0 @@
-export { UG as default } from '../index.js'

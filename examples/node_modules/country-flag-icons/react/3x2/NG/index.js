@@ -1,1 +1,0 @@
-export { NG as default } from '../index.js'

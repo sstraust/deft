@@ -1,1 +1,0 @@
-export { IQ as default } from '../index.js'

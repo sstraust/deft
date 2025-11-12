@@ -1,1 +1,0 @@
-export { AC as default } from '../index.js'

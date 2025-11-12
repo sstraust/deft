@@ -1,1 +1,0 @@
-export { UM as default } from '../index.js'

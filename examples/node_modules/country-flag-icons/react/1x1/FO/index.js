@@ -1,1 +1,0 @@
-export { FO as default } from '../index.js'

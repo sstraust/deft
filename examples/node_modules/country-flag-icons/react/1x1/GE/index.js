@@ -1,1 +1,0 @@
-export { GE as default } from '../index.js'

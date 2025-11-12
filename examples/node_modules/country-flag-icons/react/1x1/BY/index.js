@@ -1,1 +1,0 @@
-export { BY as default } from '../index.js'

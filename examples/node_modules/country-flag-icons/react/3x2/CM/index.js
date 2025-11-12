@@ -1,1 +1,0 @@
-export { CM as default } from '../index.js'

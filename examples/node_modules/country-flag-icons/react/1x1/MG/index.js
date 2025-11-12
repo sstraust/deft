@@ -1,1 +1,0 @@
-export { MG as default } from '../index.js'

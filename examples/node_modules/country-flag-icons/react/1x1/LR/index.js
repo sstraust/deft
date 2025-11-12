@@ -1,1 +1,0 @@
-export { LR as default } from '../index.js'

@@ -1,1 +1,0 @@
-export { MT as default } from '../index.js'

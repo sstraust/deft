@@ -1,1 +1,0 @@
-export { MX as default } from '../index.js'

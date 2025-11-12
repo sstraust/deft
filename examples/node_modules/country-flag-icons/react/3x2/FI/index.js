@@ -1,1 +1,0 @@
-export { FI as default } from '../index.js'

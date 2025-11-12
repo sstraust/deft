@@ -1,1 +1,0 @@
-export { LU as default } from '../index.js'

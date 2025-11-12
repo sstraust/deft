@@ -1,1 +1,0 @@
-export { LI as default } from '../index.js'

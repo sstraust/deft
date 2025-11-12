@@ -1,1 +1,0 @@
-export { PG as default } from '../index.js'

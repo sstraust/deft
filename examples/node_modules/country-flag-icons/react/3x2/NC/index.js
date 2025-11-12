@@ -1,1 +1,0 @@
-export { NC as default } from '../index.js'

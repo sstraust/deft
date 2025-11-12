@@ -1,1 +1,0 @@
-export { XK as default } from '../index.js'

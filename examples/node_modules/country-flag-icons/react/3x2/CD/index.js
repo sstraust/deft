@@ -1,1 +1,0 @@
-export { CD as default } from '../index.js'

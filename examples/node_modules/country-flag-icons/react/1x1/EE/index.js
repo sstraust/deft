@@ -1,1 +1,0 @@
-export { EE as default } from '../index.js'

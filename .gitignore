@@ -17,5 +17,6 @@ www
 .hg/
 .cpcache
 .lsp/.cache
-examplesjs/out
-examplesjs/node_modules
+examples/out
+examples/node_modules
+examples/.shadow-cljs

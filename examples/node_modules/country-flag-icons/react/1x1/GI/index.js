@@ -1,1 +1,0 @@
-export { GI as default } from '../index.js'

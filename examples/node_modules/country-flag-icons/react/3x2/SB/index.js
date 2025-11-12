@@ -1,1 +1,0 @@
-export { SB as default } from '../index.js'

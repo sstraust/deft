@@ -1,1 +1,0 @@
-export { MA as default } from '../index.js'

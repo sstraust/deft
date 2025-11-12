@@ -1,1 +1,0 @@
-export { HM as default } from '../index.js'

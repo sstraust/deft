@@ -1,1 +1,0 @@
-export { GU as default } from '../index.js'

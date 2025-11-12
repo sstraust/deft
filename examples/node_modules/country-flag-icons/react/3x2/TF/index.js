@@ -1,1 +1,0 @@
-export { TF as default } from '../index.js'

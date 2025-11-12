@@ -1,1 +1,0 @@
-export { QA as default } from '../index.js'

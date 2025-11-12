@@ -1,1 +1,0 @@
-export { AF as default } from '../index.js'

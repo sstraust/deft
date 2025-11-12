@@ -1,1 +1,0 @@
-export { RU as default } from '../index.js'
