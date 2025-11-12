@@ -22,7 +22,6 @@
     (TypeMap. m mta)))
    
    :cljs
-   ;; ClojureScript implementation using deftype
    (deftype TypeMap [m mta]
      ILookup
      (-lookup [_ k]
@@ -60,7 +59,6 @@
      (-empty [_]
        (TypeMap. {} mta))
      
-     ;; Metadata support
      IMeta
      (-meta [_]
        mta)
@@ -69,7 +67,6 @@
      (-with-meta [_ new-mta]
        (TypeMap. m new-mta))
      
-     ;; Equality
      IEquiv
      (-equiv [this other]
        (and (instance? TypeMap other)
@@ -81,7 +78,6 @@
      (-hash [_]
        (hash [m mta]))
      
-     ;; Make it work with pr-str
      IPrintWithWriter
      (-pr-writer [_ writer opts]
        (-write writer "#deft.core.TypeMap")
@@ -91,7 +87,6 @@
      (-kv-reduce [_ f init]
        (reduce (fn [ret [k v]] (f ret k v)) init m))
      
-     ;; IFn for map-as-function behavior: (my-map :key)
      IFn
      (-invoke [this k]
        (-lookup this k))
