@@ -1,8 +1,13 @@
 (ns deft.core
   (:require [malli.core :as m]
             [deft.core-shared :refer :all]
-            [potemkin :refer [def-map-type]]))
+            [cljs.analyzer.api :as api]))
 
+
+(defmacro my-resolve [env field]
+  (if (:ns &env)
+    `(:name (api/resolve ~env ~field))
+    `(resolve ~field)))
 
 (defmacro defp
   "Define a (defp) protocol, which is essentially a list of multimethods.
@@ -37,7 +42,10 @@
                                                             (= (.indexOf (.getName ^clojure.lang.Symbol tag) ".") -1)
                                                             (not (contains? '#{int long float double char short byte boolean void
                                                                                ints longs floats doubles chars shorts bytes booleans objects} tag))
-                                                            (resolve tag))]
+                                                            (if (:ns &env)
+                                                              (:name (api/resolve &env tag))
+                                                              (resolve tag))
+                                                            )]
                                                  (symbol (.getName c))
                                                  tag))
                                 name-meta (update-in (meta (first s)) [:tag] tag-to-class)
@@ -114,16 +122,6 @@
 
 (defonce defc-fields-map (ref {}))
 
-(defn prefix-keys [ns-name m]
-  (let [prefix-fn (fn [k]
-                   (if (keyword? k)
-                     (keyword (name ns-name) (name k))
-                     k))]
-    (reduce-kv (fn [acc k v]
-                 (assoc acc (prefix-fn k) v))
-               {}
-               m)))
-
 
 (defn- deft-parse-impls [specs]
   (loop [ret {} s specs]
@@ -142,12 +140,25 @@
         skip-fields-set (set skip-fields)]
 
     (doseq [class-field (get @defc-fields-map
-                             (symbol (resolve class-name)))]
-      (let [var-name (symbol (str (namespace (symbol (resolve class-name))))
+                             (symbol
+                              ;; (my-resolve &env class-name)
+                              (if (:ns &env)
+                                (:name (api/resolve &env class-name))
+                                (resolve class-name))
+                              ;; (my-resolve class-name)
+                              ))]
+      (let [var-name (symbol (str (namespace (symbol
+                                              (if (:ns &env)
+                                                (:name (api/resolve &env class-name))
+                                                (resolve class-name)))))
                              (str class-field))]
         (when (and (not (contains? allow-override-set class-field))
                    (not (contains? skip-fields-set class-field))
-                   (resolve var-name))
+                   (if (:ns &env)
+                     (:name (api/resolve &env var-name))
+                     (resolve var-name))
+                   ;; (my-resolve var-name)
+                   )
           (throw (RuntimeException.
                   (str "witht cannot redefine an existing var.\n\n"
                        " the variable " class-field " is defined somewhere else in your environment."
@@ -158,29 +169,47 @@
    ....
 )"))))))
                              
-    `(let [{~(keyword (namespace (symbol (resolve class-name))) (name :keys))
+    `(let [{~(keyword (namespace (symbol (if (:ns &env)
+                                                (:name (api/resolve &env class-name))
+                                                (resolve class-name)))) (name :keys))
             ~(into [] (remove
               (fn [x] (contains? skip-fields-set x))
               (get @defc-fields-map
                       ;; does this happen at read time?
                       ;; you have to be careful with the resolves
-                      (symbol (resolve class-name)))))}
+                      (symbol (if (:ns &env)
+                                (:name (api/resolve &env class-name))
+                                (resolve class-name))))))}
          ~var-name]
        ~@code)))
 
 
-(defn get-method-impl-name [interface-name impl]
+(defn get-method-impl-name-clj [interface-name impl]
   (if (qualified-symbol? (first impl))
     (first impl)
+    ;; need to carefully figure this out
     (symbol (str (.ns (resolve interface-name)))
             (str (first impl)))))
+
+(defn get-method-impl-name-cljs [interface-name impl env]
+  (if (qualified-symbol? (first impl))
+    (first impl)
+    (symbol (str (:ns (api/resolve env interface-name)))
+            (str (first impl)))))
+
+(defn get-method-impl-name [interface-name impl env]
+  (if (:ns env)
+    (get-method-impl-name-cljs interface-name impl env)
+    (get-method-impl-name-clj interface-name impl)))
+
+
 
 (defmacro define-proto-implementations [type-obj type-name & record-implementations]
   `(do ~@(for [[interface-name interface-impls] (deft-parse-impls record-implementations)
                impl (::impls interface-impls)]
            ;; you need to resolve the method name from the
            ;; PROTOCOL def
-             `(defmethod ~(get-method-impl-name interface-name impl)
+             `(defmethod ~(get-method-impl-name interface-name impl &env)
                 ~type-name
               ~(second impl)
               (witht [~type-obj ~(first (second impl))]
@@ -192,7 +221,7 @@
                                 (= :all (:allows-external (::opts interface-impls))) nil
                                 :else (into []
                                              (concat (:allows-external (::opts interface-impls))
-                                                     (map (fn [impl] (get-method-impl-name interface-name impl)) (::impls interface-impls)))))))
+                                                     (map (fn [impl] (get-method-impl-name interface-name impl &env)) (::impls interface-impls)))))))
        ))
 
 

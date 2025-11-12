@@ -1,12 +1,11 @@
 (ns examples.tic-tac-toe
   (:require
-   ;; [deft.core-cljs]
    [deft.core-shared]
    [malli.core]
    [easyreagent.components :as er]
    [reagent.core :as r]
    [reagent.dom.client :as rdom-client])
-  (:require-macros [deft.core-cljs :refer [deft witht defp defnt]]))
+  (:require-macros [deft.core :refer [deft witht defp defnt]]))
 
 
 (deft GameBoard [tiles
