@@ -133,8 +133,9 @@
     (deft MyClass13 [hello13])
 
     (is (thrown? Exception
-                 (macroexpand-1 '(witht [MyClass13 (>MyClass13 :hello "hi")]
-                                   hello))))
+                 (macroexpand-1 '(witht [MyClass13 (>MyClass13 :hello13 "hi")]
+                                   hello13))))
+    
 
     (is (= (witht [MyClass13 (>MyClass13 :hello13 "hi") :allow-overrides [] :skip-fields [hello13]]
              hello13)
@@ -143,3 +144,8 @@
     (is (= (witht [MyClass13 (>MyClass13 :hello13 "hi") :allow-overrides [hello13] :skip-fields []]
              hello13)
            "hi"))))
+
+
+
+
+

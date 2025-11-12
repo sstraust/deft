@@ -183,7 +183,7 @@
   `(do
      (def ~class-name "nil")
      (defn ~(symbol (str ">" (name class-name))) [& {:as args#}]
-       (~'spicyclojuremacros.deft/prefix-keys ~(str *ns*) args#)
+       (~'deft.core/prefix-keys ~(str *ns*) args#)
        )))
 
 
@@ -210,6 +210,6 @@
             (when attr-map [attr-map])
             [params]
             (when conds [conds])
-            [`(witht [~obj-type ~(first params)]
+            [`(~'witht [~obj-type ~(first params)]
                ~@rest-of-body)]
             ))))

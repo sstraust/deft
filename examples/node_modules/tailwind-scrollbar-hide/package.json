@@ -1,0 +1,50 @@
+{
+  "name": "tailwind-scrollbar-hide",
+  "version": "4.0.0",
+  "description": "tailwindcss plugin for hide scrollbar",
+  "keywords": [
+    "tailwindcss",
+    "scrollbar",
+    "scrollbar-hide"
+  ],
+  "homepage": "https://github.com/reslear/tailwind-scrollbar-hide#readme",
+  "bugs": {
+    "url": "https://github.com/reslear/tailwind-scrollbar-hide/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reslear/tailwind-scrollbar-hide.git"
+  },
+  "license": "MIT",
+  "author": "reslear",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./v4": "./src/styles.css"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src/styles.css"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "pnpm build"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.28",
+    "tailwindcss": "4.1.8",
+    "typescript": "5.8.3"
+  },
+  "peerDependencies": {
+    "tailwindcss": ">=3.0.0 || >= 4.0.0 || >= 4.0.0-beta.8 || >= 4.0.0-alpha.20"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

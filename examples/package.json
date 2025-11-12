@@ -1,0 +1,43 @@
+{
+  "dependencies": {
+    "@babel/generator": "^7.28.0",
+    "@babel/parser": "^7.27.5",
+    "@babel/standalone": "^7.27.6",
+    "@babel/traverse": "^7.28.4",
+    "@babel/types": "^7.28.1",
+    "@codemirror/autocomplete": "^6.18.6",
+    "@codemirror/commands": "^6.8.1",
+    "@codemirror/lang-javascript": "^6.2.4",
+    "@codemirror/language": "^6.11.1",
+    "@codemirror/lint": "^6.8.5",
+    "@codemirror/search": "^6.5.11",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.37.2",
+    "@emotion/is-prop-valid": "^1.3.1",
+    "@tailwindcss/cli": "^4.1.4",
+    "buffer": "^6.0.3",
+    "create-react-class": "^15.7.0",
+    "framer-motion": "^11.18.2",
+    "js-beautify": "^1.15.4",
+    "lucide-react": "^0.511.0",
+    "os": "^0.1.2",
+    "prettier": "^3.5.3",
+    "process": "^0.11.10",
+    "react": "^18.3.1",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-color": "^2.19.3",
+    "react-dom": "^18.3.1",
+    "react-infinite-scroller": "^1.2.6",
+    "react-phone-number-input": "^3.4.11",
+    "react-reverse-portal": "^2.3.0",
+    "recast": "^0.23.11",
+    "tailwind-scrollbar-hide": "^4.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.16",
+    "autoprefixer": "^10.4.19",
+    "daisyui": "^5.0.27",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^4.1.7"
+  }
+}

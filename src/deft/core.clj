@@ -1,5 +1,6 @@
 (ns deft.core
   (:require [malli.core :as m]
+            [deft.core-shared :refer :all]
             [potemkin :refer [def-map-type]]))
 
 
@@ -159,6 +160,7 @@
   (let [[class-name var-name  & {:keys [allow-overrides skip-fields]}] def-list
         allow-override-set (set allow-overrides)
         skip-fields-set (set skip-fields)]
+
     (doseq [class-field (get @defc-fields-map
                              (symbol (resolve class-name)))]
       (let [var-name (symbol (str (namespace (symbol (resolve class-name))))
