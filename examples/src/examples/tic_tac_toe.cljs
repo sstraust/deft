@@ -1,6 +1,7 @@
 (ns examples.tic-tac-toe
   (:require
-   [deft.core-cljs]
+   ;; [deft.core-cljs]
+   [deft.core-shared]
    [malli.core]
    [easyreagent.components :as er]
    [reagent.core :as r]

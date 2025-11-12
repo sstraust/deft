@@ -1,28 +1,8 @@
 (ns deft.core-cljs
   (:require [malli.core :as m]
             [cljs.analyzer.api :as api]
-            [deft.core-shared :refer :all]
-            [potemkin :refer [def-map-type]]))
+            [deft.core-shared :refer :all]))
 
-
-;; immitate record dereference type behavior
-(def-map-type TypeMap [m mta]
-  (get [_ k default-value]
-       (if (contains? m k)
-         (get m k)
-         default-value))
-  (assoc [_ k v]
-    (TypeMap. (assoc m k v) mta))
-  (dissoc [_ k]
-          (if (contains? (:required-keys mta) k)
-            m
-            (TypeMap. (dissoc m k) mta)))
-  (keys [_]
-    (keys m))
-  (meta [_]
-    mta)
-  (with-meta [_ mta]
-    (TypeMap. m mta)))
 
 
 (defmacro defp
@@ -135,15 +115,15 @@
 
 (defonce defc-fields-map (ref {}))
 
-(defn prefix-keys [ns-name m]
-  (let [prefix-fn (fn [k]
-                   (if (keyword? k)
-                     (keyword (name ns-name) (name k))
-                     k))]
-    (reduce-kv (fn [acc k v]
-                 (assoc acc (prefix-fn k) v))
-               {}
-               m)))
+;; (defn prefix-keys [ns-name m]
+;;   (let [prefix-fn (fn [k]
+;;                    (if (keyword? k)
+;;                      (keyword (name ns-name) (name k))
+;;                      k))]
+;;     (reduce-kv (fn [acc k v]
+;;                  (assoc acc (prefix-fn k) v))
+;;                {}
+;;                m)))
 
 
 (defn- deft-parse-impls [specs]
@@ -255,7 +235,7 @@
      ;; (>Circle :position [1 2] :radius 12)
      ;; now for every protocol, I want to do check-implements on that protocol
      (defn ~(symbol (str ">" (name class-name))) [& {:as args#}]
-       (TypeMap.
+       (->TypeMap
          (assoc (prefix-keys ~(str *ns*) args#)
                 :type ~type-name)
          {:type ~type-name
