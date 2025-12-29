@@ -1,3 +1,11 @@
+# TODOs BEFORE PUBLISHING
+
+1. Decide on :type vs. type dispatch
+2. carefully review implementations of TypeMap for correctness
+3. write unit tests for the API spec
+4. verify that the documentation matches _exactly_ what's in the documented tests
+5. figure out how to export this as a package to clojars
+
 # Deft
 
 A collection of macros designed to address issues with objects in Clojure.
