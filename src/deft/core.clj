@@ -5,7 +5,7 @@
 
 
 (defmacro defp
-  "Define a (defp) protocol, which is essentially a list of multimethods.
+  "Define a (defp) protocol, which is essentially just a list of multimethods.
 
   It uses the same syntax as defprotocol, e.g.
 
@@ -18,7 +18,7 @@
      :external-methods -- a list of methods in this protocol where 'defmulti' is defined elsewhere.
      :extends -- a protocol that this protocol extends. This creates a union of all methods defined here
                  and in the parent protocol
-  method-signatures -- the actual methods to implement. for everything here, define a new multimethod on type
+  method-signatures -- the actual methods to implement. for everything here, define a new 'defmulti' dispatching on type
      and then attach it to this protocol
   "
   [protocol-name & opts+sigs]
@@ -115,7 +115,7 @@
       true)))
 
 
-(defonce defc-fields-map (ref {}))
+(defonce deft-fields-map (ref {}))
 
 
 (defn- deft-parse-impls [specs]
@@ -134,7 +134,7 @@
         allow-override-set (set allow-overrides)
         skip-fields-set (set skip-fields)]
 
-    (doseq [class-field (get @defc-fields-map
+    (doseq [class-field (get @deft-fields-map
                              (symbol
                               (if (:ns &env)
                                 (:name (api/resolve &env class-name))
@@ -165,9 +165,7 @@
                                                 (resolve class-name)))) (name :keys))
             ~(into [] (remove
               (fn [x] (contains? skip-fields-set x))
-              (get @defc-fields-map
-                      ;; does this happen at read time?
-                      ;; you have to be careful with the resolves
+              (get @deft-fields-map
                       (symbol (if (:ns &env)
                                 (:name (api/resolve &env class-name))
                                 (resolve class-name))))))}
@@ -197,8 +195,7 @@
 (defmacro define-proto-implementations [type-obj type-name & record-implementations]
   `(do ~@(for [[interface-name interface-impls] (deft-parse-impls record-implementations)
                impl (::impls interface-impls)]
-           ;; you need to resolve the method name from the
-           ;; PROTOCOL def
+           ;; get-method-impl-name resolves the method name from the ns where the PROTOCOL was defined
              `(defmethod ~(get-method-impl-name interface-name impl &env)
                 ~type-name
               ~(second impl)
@@ -237,7 +234,7 @@
         keywords-args (take-while (comp keyword? first) (partition 2 (next record-implementations)))
         opts (into {} (into [] (map #(apply vector %) keywords-args)))
         record-implementations (drop (* 2 (count keywords-args)) record-implementations)]
-    (dosync (alter defc-fields-map
+    (dosync (alter deft-fields-map
                  assoc
                  (symbol (str *ns*) (name class-name))
                  fields-list))
@@ -247,11 +244,7 @@
        ~(into []
               (cons :map (for [[field type] fields-to-types]
                            [(keyword (str *ns*) (str field)) type]))))
-     ;; (when (:extends opts)
-     ;;   (derive ~type-name ~(:extends opts)))
-     ;; what should the interface be?
-     ;; (>Circle :position [1 2] :radius 12)
-     ;; now for every protocol, I want to do check-implements on that protocol
+
      (defn ~(symbol (str ">" (name class-name))) [& {:as args#}]
        (->TypeMap
          (assoc (prefix-keys ~(str *ns*) args#)
@@ -271,15 +264,9 @@
             ~class-name]))))
 
 
-;; now you want to write your custom defn sugar
-;; which is surprisingly nontrivial
 
-;; lets look at how malli does it
-
-
-;; I need to untangle the rest of body as attr-map and docstring?
-
-;; TODO -- DOESN"T CURRENTLY SUPPORT MULTI-ARGUMENT FUNCTIONS
+;; TODO -- DOESN'T CURRENTLY SUPPORT MULTI-ARGUMENT FUNCTIONS
+;; TODO don't allow pre-post map for now because it's confusing to implement
 (defmacro defnt [fn-name & rest-of-body]
   (let [doc-string (when (string? (first rest-of-body)) (first rest-of-body))
         rest-of-body (if doc-string (next rest-of-body) rest-of-body)
@@ -307,7 +294,6 @@
             ))))
 
 
-        ;; TODO don't allow pre-post map for now because it's confusing to implement
 
   
 
