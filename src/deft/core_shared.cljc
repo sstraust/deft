@@ -121,7 +121,6 @@
 
 (defmethod pprint/simple-dispatch   TypeMap [input]
     (print (str input)))
-;; (type (.-mta ww))
 
 
 

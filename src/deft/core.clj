@@ -272,7 +272,6 @@
          (print-method k w)
          (.write w " ")
          (print-method v w))
-       ;; (.write w (clojure.string/join " " (mapcat identity de-namespaced-keys)))
        (.write w ")")))
      (defmethod clojure.pprint/simple-dispatch ~type-name [input#]
        (pr input#))
