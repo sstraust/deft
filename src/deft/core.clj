@@ -62,7 +62,7 @@
                         {} sigs))]
     `(do
        ~@(for [method (vals sigs)]
-           `(defmulti ~(symbol (str  (:name method))) (fn [~'this & ~'args] (:type ~'this))))
+           `(defmulti ~(symbol (str  (:name method))) (fn [~'this & ~'args] (type ~'this))))
        
        (def ~protocol-name
          (apply merge-with concat
@@ -247,12 +247,35 @@
 
      (defn ~(symbol (str ">" (name class-name))) [& {:as args#}]
        (->TypeMap
-         (assoc (prefix-keys ~(str *ns*) args#)
-                :type ~type-name)
+         (prefix-keys ~(str *ns*) args#)
          {:type ~type-name
           :required-keys (set (keys (prefix-keys ~(str *ns*) args#)))})
        )
      (define-proto-implementations ~class-name ~type-name ~@record-implementations)
+
+     (defmethod print-method ~type-name ~'[input  w]
+       ~'(let [t (type input)
+          de-namespaced-keys (for [[k v] (.-m input)]
+                               [(if (= (namespace k) (namespace t))
+                                  (keyword (name k))
+                                  k)
+                                v])
+          function-name (str (namespace t) "/>" (name t))
+          function-name (if (= (resolve (symbol function-name))
+                               (resolve (symbol (str ">" (name t)))))
+                          (str ">" (name t))
+                          function-name)]
+       (.write w "(")
+       (.write w function-name)
+       (doseq [[k v] de-namespaced-keys]
+         (.write w " ")
+         (print-method k w)
+         (.write w " ")
+         (print-method v w))
+       ;; (.write w (clojure.string/join " " (mapcat identity de-namespaced-keys)))
+       (.write w ")")))
+     (defmethod clojure.pprint/simple-dispatch ~type-name [input#]
+       (pr input#))
 
      (m/=> ~(symbol (str ">" (name class-name)))
            [:=> [:cat ~(into []

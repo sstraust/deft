@@ -214,6 +214,10 @@ If you want to implement a method that is defined externally to the protocol, yo
 In defmethod, Circle is also the dispatch value, so it describes what *type* of thing you're defining, and is in some sense part of the _name_ of what you are trying to implement. In defnt, the fact that you're using Circle destructuring under the hood is an implementation detail, and so it belongs with the argument list (and after any docstrings). I know it seems strange to have two styles, but I thought long and hard about this, and decided this was the best approach for code readability, especially for scanning large existing files to see how they work.
 -->
 
+
+#### Behavior that is not guaranteed/likely to change
+By default, printing a deft object will print the constructor for this object. While this is usefulfor convenience, you should not rely on string-processing this output, as I'm still nailing down the exact right way to do this.
+
 #### Design Decisions
 
 ##### Add more features to multimethods vs. add more features to records

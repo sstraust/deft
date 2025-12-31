@@ -1,7 +1,9 @@
 (ns deft.deft-test
   (:require
+   [clojure.pprint :as pprint]
    [clojure.test :refer :all]
    [deft.core :refer :all :as deft]
+   [deft.core-shared :as core-shared]
    [deft.deftest-external-ns-helper :as deftest-external-ns-helper]
    [malli.core]
    [malli.instrument :as mi]))
@@ -106,9 +108,10 @@
       "Verify that deft constructor can be called from other ns."
     (is (= (deftest-external-ns-helper/>Circle12 :position 1
              :radius 12)
-           {:deft.deftest-external-ns-helper/position 1,
-            :deft.deftest-external-ns-helper/radius 12,
-            :type :deft.deftest-external-ns-helper/Circle12})))
+           (core-shared/->TypeMap
+             {:deft.deftest-external-ns-helper/position 1,
+              :deft.deftest-external-ns-helper/radius 12}
+             {:type :deft.deftest-external-ns-helper/Circle12}))))
   (testing
       "Verify that defp can be implemented from other ns."
     (deft Circle12-2 []
@@ -148,4 +151,10 @@
 
 
 
+(comment
+
+  ;; now I need to create tests to verify print behavior
+
+
+)
 
