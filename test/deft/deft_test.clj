@@ -1,9 +1,7 @@
 (ns deft.deft-test
   (:require
-   [clojure.pprint :as pprint]
    [clojure.test :refer :all]
    [deft.core :refer :all :as deft]
-   [deft.core-shared :as core-shared]
    [deft.deftest-external-ns-helper :as deftest-external-ns-helper]
    [malli.core]
    [malli.instrument :as mi]))
@@ -62,7 +60,7 @@
 (deftest dissoc-types-test
   (testing
       "test that dissoc reatins record type, except when dissocing initialized field"
-    (deft DissocCircle [position radius])
+    (deft DissocCircle [position radius] :record-like)
     (is (= (type
             (dissoc 
              (>DissocCircle :position [3 4]
@@ -108,10 +106,9 @@
       "Verify that deft constructor can be called from other ns."
     (is (= (deftest-external-ns-helper/>Circle12 :position 1
              :radius 12)
-           (core-shared/->TypeMap
-             {:deft.deftest-external-ns-helper/position 1,
-              :deft.deftest-external-ns-helper/radius 12}
-             {:type :deft.deftest-external-ns-helper/Circle12}))))
+           {:deft.deftest-external-ns-helper/position 1,
+            :deft.deftest-external-ns-helper/radius 12,
+            :type :deft.deftest-external-ns-helper/Circle12})))
   (testing
       "Verify that defp can be implemented from other ns."
     (deft Circle12-2 []
@@ -168,8 +165,8 @@
 
   
   (println "hi")
-  (deft Rectangle [side1 side2] :record-like)
-  (>Rectangle :side1 1 :side2 3)
+  (deft Rectangle3 [side1 side2] :record-like)
+  (>Rectangle3 :side1 1 :side2 3)
 
   
 
