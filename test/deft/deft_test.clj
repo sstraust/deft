@@ -155,19 +155,3 @@
 ;;       that retains its type when keys are dissoced. you are creating
 ;;       potentially more issues and complexity, because now you need to
 ;;       define equality for this relation. maybe ignore this thing for now
-;; 
-(comment
-
-  (println (macroexpand-1 '(deft Rectangle [side1 side2] :record-like)))
-  (println '(deft Rectangle [side1 side2] :record-like))
-  (print "hi")
-  
-
-  
-  (println "hi")
-  (deft Rectangle3 [side1 side2] :record-like)
-  (>Rectangle3 :side1 1 :side2 3)
-
-  
-
-  )
