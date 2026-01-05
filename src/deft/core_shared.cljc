@@ -1,25 +1,48 @@
 (ns deft.core-shared
-  (:require [malli.core :as m]
-            #?(:clj [potemkin.collections :refer [def-map-type]])))
+  (:require
+   #?(:clj [potemkin.collections :refer [def-map-type]])
+   [clojure.pprint :as pprint]))
 
 #?(:clj
    (def-map-type TypeMap [m mta]
-  (get [_ k default-value]
-       (if (contains? m k)
-         (get m k)
-         default-value))
-  (assoc [_ k v]
-    (TypeMap. (assoc m k v) mta))
-  (dissoc [_ k]
-          (if (contains? (:required-keys mta) k)
-            (dissoc m k)
-            (TypeMap. (dissoc m k) mta)))
-  (keys [_]
-    (keys m))
-  (meta [_]
-    mta)
-  (with-meta [_ mta]
-    (TypeMap. m mta)))
+     (get [_ k default-value]
+          (if (contains? m k)
+            (get m k)
+            default-value))
+     (assoc [_ k v]
+            (TypeMap. (assoc m k v) mta))
+     (dissoc [_ k]
+             (if (contains? (:required-keys mta) k)
+               (dissoc m k)
+               (TypeMap. (dissoc m k) mta)))
+     (keys [_]
+           (keys m))
+     (meta [_]
+           mta)
+     (with-meta [_ mta]
+       (TypeMap. m mta))
+
+     Object
+     (equals [this other]
+             (and (instance? TypeMap other)
+                  (= m (.-m ^TypeMap other))
+                  (= (:type mta) (:type (.-mta ^TypeMap other)))))
+     (hashCode [this]
+               (hash [m (:type mta)]))
+     (toString [this]
+               (pr-str this))
+
+     clojure.lang.IHashEq
+     (hasheq [_]
+             (hash [TypeMap m (:type mta)]))
+
+
+     clojure.lang.IPersistentCollection
+     (equiv [this other]
+            (and (instance? TypeMap other)
+                  (= m (.-m ^TypeMap other))
+                  (= (:type mta) (:type (.-mta ^TypeMap other)))))
+     )
    
    :cljs
    (deftype TypeMap [m mta]
@@ -91,7 +114,14 @@
      (-invoke [this k]
        (-lookup this k))
      (-invoke [this k not-found]
-       (-lookup this k not-found))))
+       (-lookup this k not-found)))
+
+
+   )
+
+(defmethod pprint/simple-dispatch   TypeMap [input]
+    (print (str input)))
+
 
 
 (defn check-implements

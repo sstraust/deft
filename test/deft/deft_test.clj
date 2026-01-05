@@ -60,7 +60,7 @@
 (deftest dissoc-types-test
   (testing
       "test that dissoc reatins record type, except when dissocing initialized field"
-    (deft DissocCircle [position radius])
+    (deft DissocCircle [position radius] :record-like)
     (is (= (type
             (dissoc 
              (>DissocCircle :position [3 4]
@@ -147,5 +147,11 @@
 
 
 
-
-
+;; TODO:
+;;  -- Create tests to verify printing behavior
+;;  -- Create tests to verify that objects without the same type
+;;       are not considered equal
+;;  -- Create a fragment type to represent a typemap style object
+;;       that retains its type when keys are dissoced. you are creating
+;;       potentially more issues and complexity, because now you need to
+;;       define equality for this relation. maybe ignore this thing for now

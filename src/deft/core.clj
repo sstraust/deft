@@ -62,7 +62,7 @@
                         {} sigs))]
     `(do
        ~@(for [method (vals sigs)]
-           `(defmulti ~(symbol (str  (:name method))) (fn [~'this & ~'args] (:type ~'this))))
+           `(defmulti ~(symbol (str  (:name method))) (fn [~'this & ~'args] (or (:type ~'this) (type ~'this)))))
        
        (def ~protocol-name
          (apply merge-with concat
@@ -212,6 +212,29 @@
        ))
 
 
+(defmacro define-record-like-print-methods [type-name]
+  `(do (defmethod print-method ~type-name ~'[input  w]
+         ~'(let [t (type input)
+                 de-namespaced-keys (for [[k v] (.-m input)]
+                                      [(if (= (namespace k) (namespace t))
+                                         (keyword (name k))
+                                         k)
+                                       v])
+                 function-name (str (namespace t) "/>" (name t))
+                 function-name (if (= (resolve (symbol function-name))
+                                      (resolve (symbol (str ">" (name t)))))
+                                 (str ">" (name t))
+                                 function-name)]
+             (.write w "(")
+             (.write w function-name)
+             (doseq [[k v] de-namespaced-keys]
+               (.write w " ")
+               (print-method k w)
+               (.write w " ")
+               (print-method v w))
+             (.write w ")")))
+       (defmethod clojure.pprint/simple-dispatch ~type-name [input#]
+         (pr input#))))
 
 
 
@@ -231,37 +254,44 @@
                             :else (recur (drop 1 inp-list) (concat outp-list [[(first inp-list) :any]]))))
         fields-list (mapv first fields-to-types)
 
+        tagged-args (set (take-while #(contains? #{:record-like} %) record-implementations))
         keywords-args (take-while (comp keyword? first) (partition 2 (next record-implementations)))
         opts (into {} (into [] (map #(apply vector %) keywords-args)))
-        record-implementations (drop (* 2 (count keywords-args)) record-implementations)]
-    (dosync (alter deft-fields-map
-                 assoc
-                 (symbol (str *ns*) (name class-name))
-                 fields-list))
+        record-implementations (drop (+ (count tagged-args) (* 2 (count keywords-args))) record-implementations)]
+    (dosync
+     (alter deft-fields-map
+            assoc
+            (symbol (str *ns*) (name class-name))
+            fields-list))
     `(do
-     (def ~class-name
+       (def ~class-name
+         ~(into []
+                ;; TODO define the output type as TYPEMAP when doing the record type
+                ;; or maybe just like think really carefully about what this type is, and what it should represent
+                (cons :map (for [[field type] fields-to-types]
+                             [(keyword (str *ns*) (str field)) type]))))
        
-       ~(into []
-              (cons :map (for [[field type] fields-to-types]
-                           [(keyword (str *ns*) (str field)) type]))))
+       (defn ~(symbol (str ">" (name class-name))) [& {:as ~'args-list}]
+         ~(if (contains? tagged-args :record-like)
+            `(->TypeMap
+              (prefix-keys ~(str *ns*) ~'args-list)
+              {:type ~type-name
+               :required-keys (set (keys (prefix-keys ~(str *ns*) ~'args-list)))})
+            `(assoc (prefix-keys ~(str *ns*) ~'args-list)
+                    :type ~type-name)))
+     
+       (define-proto-implementations ~class-name ~type-name ~@record-implementations)
+       (when ~(contains? tagged-args :record-like)
+         (define-record-like-print-methods ~type-name))
 
-     (defn ~(symbol (str ">" (name class-name))) [& {:as args#}]
-       (->TypeMap
-         (assoc (prefix-keys ~(str *ns*) args#)
-                :type ~type-name)
-         {:type ~type-name
-          :required-keys (set (keys (prefix-keys ~(str *ns*) args#)))})
-       )
-     (define-proto-implementations ~class-name ~type-name ~@record-implementations)
-
-     (m/=> ~(symbol (str ">" (name class-name)))
-           [:=> [:cat ~(into []
-                             (cons :catn
-                                   (for [field fields-list]
-                                           [(keyword (str field))
-                                            [:cat [:= (keyword (str field))]
-                                             :any]])))]
-            ~class-name]))))
+       (m/=> ~(symbol (str ">" (name class-name)))
+             [:=> [:cat ~(into []
+                               (cons :catn
+                                     (for [field fields-list]
+                                       [(keyword (str field))
+                                        [:cat [:= (keyword (str field))]
+                                         :any]])))]
+              ~class-name]))))
 
 
 

@@ -10,5 +10,5 @@
 (defp Shape
   (test-area [this]))
 
-(defmulti my-external-method type)
+(defmulti my-external-method :type)
 
