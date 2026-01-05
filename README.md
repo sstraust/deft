@@ -216,7 +216,12 @@ In defmethod, Circle is also the dispatch value, so it describes what *type* of 
 
 
 #### Behavior that is not guaranteed/likely to change
-By default, printing a deft object will print the constructor for this object. While this is usefulfor convenience, you should not rely on string-processing this output, as I'm still nailing down the exact right way to do this.
+- You should not rely on inspecting the value inside of protocols. i.e. if you define a protocol, ```(defp Shape ...)``` the value of that protocol will be a map containing a list of required multimethods. You should not rely on the structure of this map.
+- record-like syntax is experimental and not as rigorously tested.
+- When using record-like syntax, printing a deft object will print the constructor for this object. While this is usefulfor convenience, you should not rely on string-processing this output, as I'm still nailing down the exact right way to do this.
+
+
+
 
 #### Design Decisions
 

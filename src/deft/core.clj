@@ -254,7 +254,6 @@
                             :else (recur (drop 1 inp-list) (concat outp-list [[(first inp-list) :any]]))))
         fields-list (mapv first fields-to-types)
 
-        ;; so if I want to have a type here, then I need to add it into keyword args
         tagged-args (set (take-while #(contains? #{:record-like} %) record-implementations))
         keywords-args (take-while (comp keyword? first) (partition 2 (next record-implementations)))
         opts (into {} (into [] (map #(apply vector %) keywords-args)))
