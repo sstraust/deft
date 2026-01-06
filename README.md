@@ -1,8 +1,8 @@
 # TODOs BEFORE PUBLISHING
 
-1. Decide on :type vs. type dispatch
-2. carefully review implementations of TypeMap for correctness
-3. write unit tests for the API spec
+1. Decide on :type vs. type dispatch  // DONE
+2. carefully review implementations of TypeMap for correctness // will do as future work, record-like is not part of main api spec
+3. write unit tests for the API spec // DONE
 4. verify that the documentation matches _exactly_ what's in the documented tests
 5. figure out how to export this as a package to clojars
 
@@ -53,8 +53,8 @@ Define a type of thing.
 
 What this does is:
 - Define Circle, so it evaluates to a Malli schema, which is a map containing the keys ::position and ::radius
-- Define >Circle, a convenience function taking in the keyword arguments :position and :radius, and returning a new map that implements that Malli schema, as well as type metadata about what thing was created. The type evaluates to ::Circle, and can be used in multimethod definitions.
-- Globally register the metadata that Circle contains the keys ::position and ::radius, such that it can later be destructured automatically using witht.
+- Define >Circle, a convenience function taking in the keyword arguments :position and :radius, and returning a new map that implements that Malli schema, and contains a :type keyword about what thing was created. The :type evaluates to ::Circle, and can be used in multimethod definitions.
+- Globally register the deft metadata that Circle contains the keys ::position and ::radius, such that it can later be destructured automatically using witht.
 
 
 You can also attach additional info to the Malli schema, e.g.
@@ -74,6 +74,8 @@ We go into detail on this in the defp section, but provide an example of the syn
    Shape
    (area [this] (* pi radius radius)))
 ```
+
+note: Currently the malli schema for the constructor ```(>Circle :position [1 2] :radius 2)```, requires that the keys be defined in the order that they were defined (:position first, :radius second), due to limitations of the Malli framework (https://github.com/metosin/malli/issues/994, https://github.com/metosin/malli/issues/1003 )
 
 #### witht
 A convenience tool for accessing the value inside of a deft.
@@ -184,6 +186,8 @@ If you want to implement a method that is defined externally to the protocol, yo
    (draw-stuff/draw [this] (draw this)))
 ```
 
+by default any methods without an explicit namespace prefix are namespaced to the same place as where MyProtocol was defined.
+
 <!-- #### extendt (under development) -->
 <!-- Lets you extend a type definition. Works the same way as the implementations block of deft. -->
 <!-- ```clojure -->
@@ -219,7 +223,12 @@ In defmethod, Circle is also the dispatch value, so it describes what *type* of 
 - You should not rely on inspecting the value inside of protocols. i.e. if you define a protocol, ```(defp Shape ...)``` the value of that protocol will be a map containing a list of required multimethods. You should not rely on the structure of this map.
 - record-like syntax is experimental and not as rigorously tested.
 - When using record-like syntax, printing a deft object will print the constructor for this object. While this is usefulfor convenience, you should not rely on string-processing this output, as I'm still nailing down the exact right way to do this.
+- Currently the deft constructor function only defines a Malli schema, and only checks that you've supplied all the map's keys as input if you instrument the malli schema. you should not depend on this behavior (i.e. you should not intentionally not instrument a constructor, and then provide partial fragments of the type's fields, because we may add additionl checks for this in the future). You also should not depend directly on the format of the constructor's spec beyond basic instrumentation.
+- currently we do not enforce that protocols cannot define _additional_ methods. i.e. we don't enforce that all methods defined inside of deft must appear in the defp definition for the protocol, but plan to in the future.
+- we also may plan to add in the future the ability to define headless methods on a deft type, that are not associated with any particular protocol, though the use-case for this is largely solved by defnt
 
+
+In general, the behavior documented as ```^:api-spec``` in our tests is stuff that I intend to be stable and will be hesitant/reluctant to change. If you want to know whether certain behavior is part of the library/intentional, check to see if there is a test for it that is designated with ```^:api-spec```.
 
 
 
