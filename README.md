@@ -52,8 +52,8 @@ A collection of macros designed to address issues with objects in Clojure.
 Define a type of thing.
 
 What this does is:
-- Define Circle, so it evaluates to a Malli schema, a :map containing the keys ::position and ::radius, and the key-value pair {:type ::Circle}
-- Define >Circle, a convenience function taking in the keyword arguments :position and :radius, and returning a new map that implements that Malli schema. It includes :type keyword, which evaluates to ::Circle, and can be used in multimethod dispatch. The >Circle function itself is annotated with an appropriate Malli schema.
+- Define Circle, so it evaluates to a Malli schema, which is a :map containing the keys ::position and ::radius, and the key-value pair {:type ::Circle}
+- Define >Circle, a constructor function taking in the keyword arguments :position and :radius, and returning a new map that implements that Malli schema. The constructed map includes the :type keyword, which evaluates to ::Circle, and can be used in multimethod dispatch. The >Circle function itself is annotated with an appropriate Malli schema.
 - Globally register the deft metadata that Circle contains the keys ::position and ::radius, such that it can later be destructured automatically using witht.
 
 
@@ -75,7 +75,7 @@ We go into detail on this in the defp section, but provide an example of the syn
    (area [this] (* pi radius radius)))
 ```
 
-note: Currently the malli schema for the constructor ```(>Circle :position [1 2] :radius 2)```, requires that the keys be defined in the order that they were defined (:position first, :radius second), due to limitations of the Malli framework (https://github.com/metosin/malli/issues/994, https://github.com/metosin/malli/issues/1003 )
+note: Currently the malli schema for the constructor ```(>Circle :position [1 2] :radius 2)```, requires that the keys be passed in the same order they appear in deft (:position first, :radius second), due to limitations of the Malli framework (https://github.com/metosin/malli/issues/994, https://github.com/metosin/malli/issues/1003 )
 
 #### witht
 A convenience tool for accessing the value inside of a deft.
@@ -186,7 +186,7 @@ If you want to implement a method that is defined externally to the protocol, yo
    (draw-stuff/draw [this] (draw this)))
 ```
 
-by default any methods without an explicit namespace prefix are namespaced to the same place as where MyProtocol was defined.
+by default any methods without an explicit namespace prefix are namespaced to the place where MyProtocol was defined.
 
 
 note: currently proto implementations use witht for destructuring, and do not have support for allow-overrides/skip-fields. I am planning to add this in a future release
@@ -225,10 +225,10 @@ In defmethod, Circle is also the dispatch value, so it describes what *type* of 
 
 ## Design Notes and Commentary
 #### Behavior that is not guaranteed/likely to change
-- You should not rely on inspecting the value inside of protocols. i.e. if you define a protocol, ```(defp Shape ...)``` the value of that protocol will be a map containing a list of required multimethods. You should not rely on the structure of this map.
+- You should not rely on inspecting the value inside of protocols. i.e. if you define a protocol, ```(defp Shape ...)``` the variable Shape evaluates to a value: it is a map containing a list of required multimethods. You should not rely on the structure of this map.
 - record-like syntax is experimental and not as rigorously tested.
 - When using record-like syntax, printing a deft object will print the constructor for this object. While this is usefulfor convenience, you should not rely on string-processing this output, as I'm still nailing down the exact right way to do this.
-- Currently the deft constructor function only defines a Malli schema, and only checks that you've supplied all the map's keys as input if you instrument the malli schema. you should not depend on this behavior (i.e. you should not intentionally not instrument a constructor, and then provide partial fragments of the type's fields, because we may add additionl checks for this in the future). You also should not depend directly on the format of the constructor's spec beyond basic instrumentation.
+- Currently the deft constructor function only defines a Malli schema, and only checks that you've supplied all the map's keys as input if you instrument the malli schema. you should not depend on this behavior (i.e. you should not intentionally not instrument a constructor, and then provide partial fragments of the type's fields, because we may add additional checks for this in the future). You also should not depend directly on the format of the constructor's spec beyond basic instrumentation.
 - currently we do not enforce that protocols cannot define _additional_ methods. i.e. we don't enforce that all methods defined inside of deft must appear in the defp definition for the protocol, but plan to in the future.
 - we also may plan to add in the future the ability to define headless methods on a deft type, that are not associated with any particular protocol, though the use-case for this is largely solved by defnt
 
