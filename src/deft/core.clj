@@ -1,7 +1,9 @@
 (ns deft.core
-  (:require [malli.core :as m]
-            [deft.core-shared :refer :all]
-            [cljs.analyzer.api :as api]))
+  (:require
+   [cljs.analyzer.api :as api]
+   [deft.core-shared :refer :all]
+   [malli.core :as m]
+   [malli.destructure :as md]))
 
 
 (defmacro defp
@@ -16,7 +18,7 @@
   protocol-name: The name of the protocol
   keyword-options: Named arguments, so far this is only
      :external-methods -- a list of methods in this protocol where 'defmulti' is defined elsewhere.
-     :extends -- a protocol that this protocol extends. This creates a union of all methods defined here
+     :extends -- a list of protocols that this protocol extends. This creates a union of all methods defined here
                  and in the parent protocol
   method-signatures -- the actual methods to implement. for everything here, define a new 'defmulti' dispatching on type
      and then attach it to this protocol
@@ -255,7 +257,7 @@
         fields-list (mapv first fields-to-types)
 
         tagged-args (set (take-while #(contains? #{:record-like} %) record-implementations))
-        keywords-args (take-while (comp keyword? first) (partition 2 (next record-implementations)))
+        keywords-args (take-while (comp keyword? first) (partition 2 record-implementations))
         opts (into {} (into [] (map #(apply vector %) keywords-args)))
         record-implementations (drop (+ (count tagged-args) (* 2 (count keywords-args))) record-implementations)]
     (dosync
@@ -268,8 +270,12 @@
          ~(into []
                 ;; TODO define the output type as TYPEMAP when doing the record type
                 ;; or maybe just like think really carefully about what this type is, and what it should represent
-                (cons :map (for [[field type] fields-to-types]
-                             [(keyword (str *ns*) (str field)) type]))))
+                ;; this _MUST_ also include the _type_ in the output
+                (cons :map
+                      (concat (for [[field type] fields-to-types]
+                                [(keyword (str *ns*) (str field)) type])
+                              (when (not (contains? tagged-args :record-like))
+                                [[:type [:= type-name]]])))))
        
        (defn ~(symbol (str ">" (name class-name))) [& {:as ~'args-list}]
          ~(if (contains? tagged-args :record-like)
@@ -285,12 +291,14 @@
          (define-record-like-print-methods ~type-name))
 
        (m/=> ~(symbol (str ">" (name class-name)))
-             [:=> [:cat ~(into []
-                               (cons :catn
-                                     (for [field fields-list]
-                                       [(keyword (str field))
-                                        [:cat [:= (keyword (str field))]
-                                         :any]])))]
+             [:=>
+              ;; TODO document and explain the order restriction
+              ~(into []
+                           (cons :cat
+                                 (mapcat identity
+                                         (for [[field type] fields-to-types]
+                                           [[:= (keyword (str field))]
+                                            type]))))
               ~class-name]))))
 
 

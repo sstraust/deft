@@ -12,3 +12,5 @@
 
 (defmulti my-external-method :type)
 
+
+(deft Rectangle16_2 [side1 side2])
