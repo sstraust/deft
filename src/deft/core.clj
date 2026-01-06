@@ -270,7 +270,6 @@
          ~(into []
                 ;; TODO define the output type as TYPEMAP when doing the record type
                 ;; or maybe just like think really carefully about what this type is, and what it should represent
-                ;; this _MUST_ also include the _type_ in the output
                 (cons :map
                       (concat (for [[field type] fields-to-types]
                                 [(keyword (str *ns*) (str field)) type])
@@ -292,7 +291,7 @@
 
        (m/=> ~(symbol (str ">" (name class-name)))
              [:=>
-              ;; TODO document and explain the order restriction
+              ;; TODO remove the order restriction once Malli improves
               ~(into []
                            (cons :cat
                                  (mapcat identity

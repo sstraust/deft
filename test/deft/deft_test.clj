@@ -665,7 +665,7 @@
 
 
 
-;; TODO:
+;; TODO tests for record-like:
 ;;  -- Create tests to verify printing behavior
 ;;  -- Create tests to verify that objects without the same type
 ;;       are not considered equal
@@ -673,4 +673,3 @@
 ;;       that retains its type when keys are dissoced. you are creating
 ;;       potentially more issues and complexity, because now you need to
 ;;       define equality for this relation. maybe ignore this thing for now
-;; (deft MyClass14 [hello14])
