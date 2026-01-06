@@ -3,7 +3,7 @@
 1. Decide on :type vs. type dispatch  // DONE
 2. carefully review implementations of TypeMap for correctness // will do as future work, record-like is not part of main api spec
 3. write unit tests for the API spec // DONE
-4. verify that the documentation matches _exactly_ what's in the documented tests
+4. verify that the documentation matches _exactly_ what's in the documented tests // DONE
 5. figure out how to export this as a package to clojars
 
 # Deft
