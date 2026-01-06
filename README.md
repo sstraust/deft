@@ -3,7 +3,7 @@
 1. Decide on :type vs. type dispatch  // DONE
 2. carefully review implementations of TypeMap for correctness // will do as future work, record-like is not part of main api spec
 3. write unit tests for the API spec // DONE
-4. verify that the documentation matches _exactly_ what's in the documented tests
+4. verify that the documentation matches _exactly_ what's in the documented tests // DONE
 5. figure out how to export this as a package to clojars
 
 # Deft
@@ -24,7 +24,7 @@ A collection of macros designed to address issues with objects in Clojure.
 - Records are not REPL friendly. If you redefine a method inside of a Clojure record, it does not take effect until that record is reinstantiated.
 - Records use single : keywords for field access, making programs difficult to refactor.
 - Defining a record method is cumbersome because it requires an interface, but it's the only way to automatically destructure the record's fields.
-- Leads to huge java-like class blocks in your programs. These are hard to manuever around, and don't let you do things like keep a method definition next to an assocaited macro definition, group related static helper functions, create let over lambdas, and generally give you the flexability to organize a program the way you want.
+- Leads to huge java-like class blocks in your programs. These are hard to manuever around, and don't let you do things like keep a method definition next to an assocaited macro definition, group related static helper functions, create let over lambdas, and generally give you the flexibility to organize a program the way you want.
 - Most people in the community recommend you use maps instead (when feasible).
 
 #### What's wrong with clojure maps (and multimethods)?
@@ -38,12 +38,12 @@ A collection of macros designed to address issues with objects in Clojure.
 - An easy-to-use macro, **deft**, that defines a type, creates an associated Malli schema, creates a constructor, and allows you to specify what Multimethods, or Multimethod collections that type must implement.
 - A macro **witht** that takes a type as input, and automatically destructures the fields of that type, similar to clojure records.
 - A macro **defp** which lets you define and implement protocols as collections of multimethods.
-- Works with clj-kondo
-- (planned) adds additional clj-kondo linters to verify types are fully and correctly defined.
+- clj-kondo macroexpansions for deft, defp, witht, and defnt
+- (planned) additional clj-kondo linters to verify types are fully and correctly defined.
 
 
 
-### Key Features
+## Key Features
 
 #### deft
 ```clojure
@@ -52,8 +52,8 @@ A collection of macros designed to address issues with objects in Clojure.
 Define a type of thing.
 
 What this does is:
-- Define Circle, so it evaluates to a Malli schema, which is a map containing the keys ::position and ::radius
-- Define >Circle, a convenience function taking in the keyword arguments :position and :radius, and returning a new map that implements that Malli schema, and contains a :type keyword about what thing was created. The :type evaluates to ::Circle, and can be used in multimethod definitions.
+- Define Circle, so it evaluates to a Malli schema, which is a :map containing the keys ::position and ::radius, and the key-value pair {:type ::Circle}
+- Define >Circle, a constructor function taking in the keyword arguments :position and :radius, and returning a new map that implements that Malli schema. The constructed map includes the :type keyword, which evaluates to ::Circle, and can be used in multimethod dispatch. The >Circle function itself is annotated with an appropriate Malli schema.
 - Globally register the deft metadata that Circle contains the keys ::position and ::radius, such that it can later be destructured automatically using witht.
 
 
@@ -75,7 +75,7 @@ We go into detail on this in the defp section, but provide an example of the syn
    (area [this] (* pi radius radius)))
 ```
 
-note: Currently the malli schema for the constructor ```(>Circle :position [1 2] :radius 2)```, requires that the keys be defined in the order that they were defined (:position first, :radius second), due to limitations of the Malli framework (https://github.com/metosin/malli/issues/994, https://github.com/metosin/malli/issues/1003 )
+note: Currently the malli schema for the constructor ```(>Circle :position [1 2] :radius 2)```, requires that the keys be passed in the same order they appear in deft (:position first, :radius second), due to limitations of the Malli framework (https://github.com/metosin/malli/issues/994, https://github.com/metosin/malli/issues/1003 )
 
 #### witht
 A convenience tool for accessing the value inside of a deft.
@@ -104,7 +104,7 @@ where ```:allow-overrides``` uses witht to override the var anyway
 and ```:skip-fields``` does not apply the binding for that field using witht
 
 
-!!!! TODO describe how this interacts with define-proto-implementations
+
 
 
 #### defp
@@ -116,10 +116,10 @@ Define a protocol as a collection of multifns. It can be *implemented* by a type
 ```
 
 What this does is:
-- Define a new multifn that dispatches on type, e.g.
-  ```(defmulti area (fn [& args] (type (first args))))```
+- Define a new multifn that dispatches on :type or type, e.g.
+  ```(defmulti area (fn [this & args] (or (:type this) (type this))))```
 - Define the *protocol* Shape, as a list of multimethods that must be implemented for something to be considered a shape. i.e. something can only be considered a shape if
-  ```(defmethod area Circle [this] ...)``` is implemented for that type.
+  ```(defmethod area ::Circle [this] ...)``` is implemented for that type.
 - Allow a user to *declare* that something implements a particular protocol.
 
 
@@ -186,7 +186,12 @@ If you want to implement a method that is defined externally to the protocol, yo
    (draw-stuff/draw [this] (draw this)))
 ```
 
-by default any methods without an explicit namespace prefix are namespaced to the same place as where MyProtocol was defined.
+by default any methods without an explicit namespace prefix are namespaced to the place where MyProtocol was defined.
+
+
+note: currently proto implementations use witht for destructuring, and do not have support for allow-overrides/skip-fields. I am planning to add this in a future release
+<!-- !!!! TODO Actually add this feature!!! -->
+
 
 <!-- #### extendt (under development) -->
 <!-- Lets you extend a type definition. Works the same way as the implementations block of deft. -->
@@ -218,12 +223,12 @@ by default any methods without an explicit namespace prefix are namespaced to th
 In defmethod, Circle is also the dispatch value, so it describes what *type* of thing you're defining, and is in some sense part of the _name_ of what you are trying to implement. In defnt, the fact that you're using Circle destructuring under the hood is an implementation detail, and so it belongs with the argument list (and after any docstrings). I know it seems strange to have two styles, but I thought long and hard about this, and decided this was the best approach for code readability, especially for scanning large existing files to see how they work.
 -->
 
-
+## Design Notes and Commentary
 #### Behavior that is not guaranteed/likely to change
-- You should not rely on inspecting the value inside of protocols. i.e. if you define a protocol, ```(defp Shape ...)``` the value of that protocol will be a map containing a list of required multimethods. You should not rely on the structure of this map.
+- You should not rely on inspecting the value inside of protocols. i.e. if you define a protocol, ```(defp Shape ...)``` the variable Shape evaluates to a value: it is a map containing a list of required multimethods. You should not rely on the structure of this map.
 - record-like syntax is experimental and not as rigorously tested.
 - When using record-like syntax, printing a deft object will print the constructor for this object. While this is usefulfor convenience, you should not rely on string-processing this output, as I'm still nailing down the exact right way to do this.
-- Currently the deft constructor function only defines a Malli schema, and only checks that you've supplied all the map's keys as input if you instrument the malli schema. you should not depend on this behavior (i.e. you should not intentionally not instrument a constructor, and then provide partial fragments of the type's fields, because we may add additionl checks for this in the future). You also should not depend directly on the format of the constructor's spec beyond basic instrumentation.
+- Currently the deft constructor function only defines a Malli schema, and only checks that you've supplied all the map's keys as input if you instrument the malli schema. you should not depend on this behavior (i.e. you should not intentionally not instrument a constructor, and then provide partial fragments of the type's fields, because we may add additional checks for this in the future). You also should not depend directly on the format of the constructor's spec beyond basic instrumentation.
 - currently we do not enforce that protocols cannot define _additional_ methods. i.e. we don't enforce that all methods defined inside of deft must appear in the defp definition for the protocol, but plan to in the future.
 - we also may plan to add in the future the ability to define headless methods on a deft type, that are not associated with any particular protocol, though the use-case for this is largely solved by defnt
 
