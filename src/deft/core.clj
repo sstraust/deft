@@ -82,6 +82,7 @@
                         ::key-fn identity}))))}
          ~(:extends opts))))))
 
+
 (defn check-implements
   "Verify that a type T implements a protocol (as defined with defp).
 
@@ -213,30 +214,37 @@
                                                      (map (fn [impl] (get-method-impl-name interface-name impl &env)) (::impls interface-impls)))))))
        ))
 
-
+;; TODO!! Check what the print methods should be for cljs
 (defmacro define-record-like-print-methods [type-name]
-  `(do (defmethod print-method ~type-name ~'[input  w]
-         ~'(let [t (type input)
-                 de-namespaced-keys (for [[k v] (.-m input)]
-                                      [(if (= (namespace k) (namespace t))
-                                         (keyword (name k))
-                                         k)
-                                       v])
-                 function-name (str (namespace t) "/>" (name t))
-                 function-name (if (= (resolve (symbol function-name))
-                                      (resolve (symbol (str ">" (name t)))))
-                                 (str ">" (name t))
-                                 function-name)]
-             (.write w "(")
-             (.write w function-name)
-             (doseq [[k v] de-namespaced-keys]
-               (.write w " ")
-               (print-method k w)
-               (.write w " ")
-               (print-method v w))
-             (.write w ")")))
-       (defmethod clojure.pprint/simple-dispatch ~type-name [input#]
-         (pr input#))))
+  (let [function-name (str (namespace type-name) "/>" (name type-name))
+        function-name (if (=
+                           (if (:ns &env)
+                             (:name (api/resolve &env (symbol function-name)))
+                             (resolve (symbol function-name)))
+                           (if (:ns &env)
+                             (:name (api/resolve &env (symbol function-name)))
+                             (resolve (symbol (str ">" (name type-name))))))
+                        (str ">" (name type-name))
+                        function-name)]
+    (when (not (:ns &env))
+      `(do (defmethod print-method ~type-name ~'[input  w]
+             (let ~'[t (type input)
+                     de-namespaced-keys (for [[k v] (.-m input)]
+                                          [(if (= (namespace k) (namespace t))
+                                             (keyword (name k))
+                                             k)
+                                           v])]
+               ~'(.write w "(")
+               (~'.write ~'w ~function-name)
+               ~'(do 
+                   (doseq [[k v] de-namespaced-keys]
+                     (.write w " ")
+                     (print-method k w)
+                     (.write w " ")
+                     (print-method v w))
+                   (.write w ")"))))
+           (defmethod clojure.pprint/simple-dispatch ~type-name [input#]
+             (pr input#))))))
 
 
 
@@ -286,8 +294,8 @@
                     :type ~type-name)))
      
        (define-proto-implementations ~class-name ~type-name ~@record-implementations)
-       (when ~(contains? tagged-args :record-like)
-         (define-record-like-print-methods ~type-name))
+       ~(when (contains? tagged-args :record-like)
+         `(define-record-like-print-methods ~type-name))
 
        (m/=> ~(symbol (str ">" (name class-name)))
              [:=>
