@@ -22,3 +22,4 @@ examples/node_modules
 examples/.shadow-cljs
 .DS_Store
 .#*
+*.pom.asc
