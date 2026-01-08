@@ -420,6 +420,7 @@
     (is (= (my-method23_7 (>Impl23_6)) "hello"))))
 
 
+
 ;; Test 24
 (deftest defp-protocols-extend-protocols-test ^:api-spec
   (testing "Verify that extending a protocol allows you to extend a protocol"
