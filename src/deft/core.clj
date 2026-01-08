@@ -82,39 +82,39 @@
                         ::key-fn identity}))))}
          ~(:extends opts))))))
 
-(defn check-implements
-  "Verify that a type T implements a protocol (as defined with defp).
+;; (defn check-implements
+;;   "Verify that a type T implements a protocol (as defined with defp).
 
-  A protocol is considered satisfied if, for every method in the protocol,
-  there exists a multimethod implementation with dispatch value T
+;;   A protocol is considered satisfied if, for every method in the protocol,
+;;   there exists a multimethod implementation with dispatch value T
 
-  [obj-type protocol & {:keys [available-methods]}]
-  obj-type: should be the _dispatch value_ that is used for multimethods.
-    for objects defined via deft, this is the _keyword_, so (deft Shape ...)
-    would result in ::Shape
-  protocol: the protocol to implement. If you define it with (defp Drawable ...)
-    it's the variable stored in Drawable
-  available-methods: a list of methods to restrict to. it's like saying, check
-    if this protocol is satisfied, but assume that we can only see the value of
-    these methods. It's useful for checking that all of the methods are defined in the same place
-    (and not sporadically). If its nil, then it does no extra filtering.
-  "
-  [obj-type protocol & {:keys [available-methods]}]
-  (let [available-methods (when available-methods (set available-methods))
-        undefined-methods
-        (into []
-        (remove nil?
-                (map (fn [{::keys [key-fn multimethod] :as method-def}]
-                            (when (or (not (contains?
-                                        (methods multimethod)
-                                        (key-fn obj-type)))
-                                      (and available-methods
-                                           (not (contains? available-methods multimethod))))
-                              method-def))
-                     (::implements-methods protocol))))]
-    (if (not (empty? undefined-methods))
-      (throw (RuntimeException. (str "methods " undefined-methods " is not defined for " obj-type " in protocol " protocol)))
-      true)))
+;;   [obj-type protocol & {:keys [available-methods]}]
+;;   obj-type: should be the _dispatch value_ that is used for multimethods.
+;;     for objects defined via deft, this is the _keyword_, so (deft Shape ...)
+;;     would result in ::Shape
+;;   protocol: the protocol to implement. If you define it with (defp Drawable ...)
+;;     it's the variable stored in Drawable
+;;   available-methods: a list of methods to restrict to. it's like saying, check
+;;     if this protocol is satisfied, but assume that we can only see the value of
+;;     these methods. It's useful for checking that all of the methods are defined in the same place
+;;     (and not sporadically). If its nil, then it does no extra filtering.
+;;   "
+;;   [obj-type protocol & {:keys [available-methods]}]
+;;   (let [available-methods (when available-methods (set available-methods))
+;;         undefined-methods
+;;         (into []
+;;         (remove nil?
+;;                 (map (fn [{::keys [key-fn multimethod] :as method-def}]
+;;                             (when (or (not (contains?
+;;                                         (methods multimethod)
+;;                                         (key-fn obj-type)))
+;;                                       (and available-methods
+;;                                            (not (contains? available-methods multimethod))))
+;;                               method-def))
+;;                      (::implements-methods protocol))))]
+;;     (if (not (empty? undefined-methods))
+;;       (throw (RuntimeException. (str "methods " undefined-methods " is not defined for " obj-type " in protocol " protocol)))
+;;       true)))
 
 
 (defonce deft-fields-map (ref {}))
@@ -213,30 +213,37 @@
                                                      (map (fn [impl] (get-method-impl-name interface-name impl &env)) (::impls interface-impls)))))))
        ))
 
-
+;; TODO!! Check what the print methods should be for cljs
 (defmacro define-record-like-print-methods [type-name]
-  `(do (defmethod print-method ~type-name ~'[input  w]
-         ~'(let [t (type input)
-                 de-namespaced-keys (for [[k v] (.-m input)]
-                                      [(if (= (namespace k) (namespace t))
-                                         (keyword (name k))
-                                         k)
-                                       v])
-                 function-name (str (namespace t) "/>" (name t))
-                 function-name (if (= (resolve (symbol function-name))
-                                      (resolve (symbol (str ">" (name t)))))
-                                 (str ">" (name t))
-                                 function-name)]
-             (.write w "(")
-             (.write w function-name)
-             (doseq [[k v] de-namespaced-keys]
-               (.write w " ")
-               (print-method k w)
-               (.write w " ")
-               (print-method v w))
-             (.write w ")")))
-       (defmethod clojure.pprint/simple-dispatch ~type-name [input#]
-         (pr input#))))
+  (let [function-name (str (namespace type-name) "/>" (name type-name))
+        function-name (if (=
+                           (if (:ns &env)
+                             (:name (api/resolve &env (symbol function-name)))
+                             (resolve (symbol function-name)))
+                           (if (:ns &env)
+                             (:name (api/resolve &env (symbol function-name)))
+                             (resolve (symbol (str ">" (name type-name))))))
+                        (str ">" (name type-name))
+                        function-name)]
+    (when (not (:ns &env))
+      `(do (defmethod print-method ~type-name ~'[input  w]
+             (let ~'[t (type input)
+                     de-namespaced-keys (for [[k v] (.-m input)]
+                                          [(if (= (namespace k) (namespace t))
+                                             (keyword (name k))
+                                             k)
+                                           v])]
+               ~'(.write w "(")
+               (~'.write ~'w ~function-name)
+               ~'(do 
+                   (doseq [[k v] de-namespaced-keys]
+                     (.write w " ")
+                     (print-method k w)
+                     (.write w " ")
+                     (print-method v w))
+                   (.write w ")"))))
+           (defmethod clojure.pprint/simple-dispatch ~type-name [input#]
+             (pr input#))))))
 
 
 
@@ -286,8 +293,8 @@
                     :type ~type-name)))
      
        (define-proto-implementations ~class-name ~type-name ~@record-implementations)
-       (when ~(contains? tagged-args :record-like)
-         (define-record-like-print-methods ~type-name))
+       ~(when (contains? tagged-args :record-like)
+         `(define-record-like-print-methods ~type-name))
 
        (m/=> ~(symbol (str ">" (name class-name)))
              [:=>

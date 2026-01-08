@@ -21,5 +21,3 @@
                [::W-B ::W-P nil nil nil nil ::W-P ::B-B]
                [::W-N ::W-P nil nil nil nil ::W-P ::B-N]
                [::W-R ::W-P nil nil nil nil ::W-P ::B-R]]))
-
-
