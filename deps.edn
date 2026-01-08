@@ -4,7 +4,14 @@
          potemkin/potemkin {:mvn/version "0.4.6"}
          metosin/malli {:mvn/version "0.17.0"}}
  :aliases
- {:test {:extra-paths ["test"]
+ {:build {:deps {io.github.clojure/tools.build {:git/tag "v0.10.12" :git/sha "97c5562"}}
+          :ns-default build}
+  :deploy {:extra-deps {slipset/deps-deploy {:mvn/version "0.2.2"}}
+          :exec-fn deps-deploy.deps-deploy/deploy
+          :exec-args {:installer :remote
+                      :sign-releases? true
+                      :artifact "target/deft-0.1.0.jar"}}
+  :test {:extra-paths ["test"]
          :extra-deps {io.github.cognitect-labs/test-runner 
                       {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
          :main-opts ["-m" "cognitect.test-runner"]
