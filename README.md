@@ -33,7 +33,9 @@ A collection of macros designed to address issues with objects in Clojure.
 - clj-kondo macroexpansions for deft, defp, witht, and defnt
 - (planned) additional clj-kondo linters to verify types are fully and correctly defined.
 
-
+#### Copy clj-kondo deps
+```clj-kondo --copy-configs --dependencies --lint "$(clojure -Spath)"```
+after installing this library, you may want to run this command to copy the clj-kondo config into your project.
 
 ## Key Features
 
@@ -293,3 +295,22 @@ But the disadvantages that:
 * Ability to refactor existing code -- this is one of my biggest pain points with the existing clojure ecosystem, and why things feel scary
 * Ease of use with the repl -- i wanna go fast vroom vroom code=yay
 * Completeness -- sort of goes along with stability, but I want this to be done once I build it
+
+
+#### Deploying
+
+In order to deploy you need to change the version number in 
+
+build.clj
+deps.edn jar name
+pom.xml
+
+
+and then do 
+
+```
+clj -T:build jar
+clj -X:deploy
+```
+
+
