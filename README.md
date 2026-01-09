@@ -33,10 +33,6 @@ A collection of macros designed to address issues with objects in Clojure.
 - clj-kondo macroexpansions for deft, defp, witht, and defnt
 - (planned) additional clj-kondo linters to verify types are fully and correctly defined.
 
-#### Copy clj-kondo deps
-```clj-kondo --copy-configs --dependencies --lint "$(clojure -Spath)"```
-after installing this library, you may want to run this command to copy the clj-kondo config into your project.
-
 ## Key Features
 
 #### deft
@@ -216,6 +212,12 @@ note: currently proto implementations use witht for destructuring, and do not ha
 ##### Why use different syntax ordering for defmethodt and defnt?
 In defmethod, Circle is also the dispatch value, so it describes what *type* of thing you're defining, and is in some sense part of the _name_ of what you are trying to implement. In defnt, the fact that you're using Circle destructuring under the hood is an implementation detail, and so it belongs with the argument list (and after any docstrings). I know it seems strange to have two styles, but I thought long and hard about this, and decided this was the best approach for code readability, especially for scanning large existing files to see how they work.
 -->
+
+
+#### Copy clj-kondo deps
+```clj-kondo --copy-configs --dependencies --lint "$(clojure -Spath)"```
+after installing this library, you may want to run this command to copy the clj-kondo config into your project.
+
 
 ## Design Notes and Commentary
 #### Behavior that is not guaranteed/likely to change
