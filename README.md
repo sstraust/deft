@@ -1,3 +1,4 @@
+[![Clojars Project](https://img.shields.io/clojars/v/org.clojars.sstraust/deft.svg)](https://clojars.org/org.clojars.sstraust/deft)
 # Deft
 
 A collection of macros designed to address issues with objects in Clojure.
