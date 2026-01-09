@@ -33,7 +33,9 @@ A collection of macros designed to address issues with objects in Clojure.
 - clj-kondo macroexpansions for deft, defp, witht, and defnt
 - (planned) additional clj-kondo linters to verify types are fully and correctly defined.
 
-
+#### Copy clj-kondo deps
+```clj-kondo --copy-configs --dependencies --lint "$(clojure -Spath)"```
+after installing this library, you may want to run this command to copy the clj-kondo config into your project.
 
 ## Key Features
 
@@ -67,7 +69,7 @@ We go into detail on this in the defp section, but provide an example of the syn
    (area [this] (* pi radius radius)))
 ```
 
-note: Currently the malli schema for the constructor ```(>Circle :position [1 2] :radius 2)```, requires that the keys be passed in the same order they appear in deft (:position first, :radius second), due to limitations of the Malli framework (https://github.com/metosin/malli/issues/994, https://github.com/metosin/malli/issues/1003 )
+note: Currently the Malli schema for the constructor ```(>Circle :position [1 2] :radius 2)```, requires that the keys be passed in the same order they appear in deft (:position first, :radius second), due to limitations of the Malli framework (https://github.com/metosin/malli/issues/994, https://github.com/metosin/malli/issues/1003 )
 
 #### witht
 A convenience tool for accessing the value inside of a deft.
@@ -220,7 +222,7 @@ In defmethod, Circle is also the dispatch value, so it describes what *type* of 
 - You should not rely on inspecting the value inside of protocols. i.e. if you define a protocol, ```(defp Shape ...)``` the variable Shape evaluates to a value: it is a map containing a list of required multimethods. You should not rely on the structure of this map.
 - record-like syntax is experimental and not as rigorously tested.
 - When using record-like syntax, printing a deft object will print the constructor for this object. While this is usefulfor convenience, you should not rely on string-processing this output, as I'm still nailing down the exact right way to do this.
-- Currently the deft constructor function only defines a Malli schema, and only checks that you've supplied all the map's keys as input if you instrument the malli schema. you should not depend on this behavior (i.e. you should not intentionally not instrument a constructor, and then provide partial fragments of the type's fields, because we may add additional checks for this in the future). You also should not depend directly on the format of the constructor's spec beyond basic instrumentation.
+- Currently the deft constructor function only defines a Malli schema, and only checks that you've supplied all the map's keys as input if you instrument the Malli schema. you should not depend on this behavior (i.e. you should not intentionally not instrument a constructor, and then provide partial fragments of the type's fields, because we may add additional checks for this in the future). You also should not depend directly on the format of the constructor's spec beyond basic instrumentation.
 - currently we do not enforce that protocols cannot define _additional_ methods. i.e. we don't enforce that all methods defined inside of deft must appear in the defp definition for the protocol, but plan to in the future.
 - we also may plan to add in the future the ability to define headless methods on a deft type, that are not associated with any particular protocol, though the use-case for this is largely solved by defnt
 
@@ -269,7 +271,7 @@ But the disadvantages that:
 ###### Another option is to use multimethods and maps only, but then add tools to enforce schema and protocol conformity
 
 Basically what this does is, given a record definition we:
-* Create a malli schema based on that definition
+* Create a Malli schema based on that definition
 * Create a constructor to create maps of that type
 * Allow you to define protocols, which are _lists_ of multimethods that must be fully defined for your schema type
 
@@ -293,3 +295,22 @@ But the disadvantages that:
 * Ability to refactor existing code -- this is one of my biggest pain points with the existing clojure ecosystem, and why things feel scary
 * Ease of use with the repl -- i wanna go fast vroom vroom code=yay
 * Completeness -- sort of goes along with stability, but I want this to be done once I build it
+
+
+#### Deploying
+
+In order to deploy you need to change the version number in 
+
+build.clj
+deps.edn jar name
+pom.xml
+
+
+and then do 
+
+```
+clj -T:build jar
+clj -X:deploy
+```
+
+
