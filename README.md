@@ -1,6 +1,8 @@
-# Deft
 
-  ![Clojars Project](https://img.shields.io/clojars/v/org.clojars.sstraust/deft.svg?color=blue)
+# Deft
+![Clojars Project](https://img.shields.io/clojars/v/org.clojars.sstraust/deft.svg?color=blue)
+<!--   ![Clojars Project](https://img.shields.io/clojars/v/org.clojars.sstraust/deft.svg?color=89f) -->
+
 
 
 A collection of macros designed to address issues with objects in Clojure.
@@ -19,7 +21,7 @@ A collection of macros designed to address issues with objects in Clojure.
 ```
 org.clojars.sstraust/deft {:mvn/version "0.1.2"}
 ```
-
+ 
 #### What's wrong with records and protocols?
 - Records are not REPL friendly. If you redefine a method inside of a Clojure record, it does not take effect until that record is reinstantiated.
 - Records use single : keywords for field access, making programs difficult to refactor.
