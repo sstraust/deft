@@ -60,7 +60,7 @@ You can also attach additional info to the Malli schema, e.g.
 
 
 
-You can also define **protocols** and **implementations** in much the same way as clojure records. However, even though we use the same syntax as clojure records, these are actually *implemented* using multimethod dispatch. This means you can do things like define custom dispatch behavior, create protocols as collections of *existing* multimethods, and have things reload properly when method definitions are evaluated in the REPL.
+You can also define **protocols** and **implementations** in much the same way as clojure records. However, even though we use the same syntax as Clojure records, these are actually *implemented* using multimethod dispatch. This means you can do things like define custom dispatch behavior, create protocols as collections of *existing* multimethods, and have things reload properly when method definitions are evaluated in the REPL.
 
 We go into detail on this in the defp section, but provide an example of the syntax below:
 ```clojure
