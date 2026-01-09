@@ -1,6 +1,5 @@
 
 # Deft
-![Clojars Project](https://img.shields.io/clojars/v/org.clojars.sstraust/deft.svg?color=blue)
 <!--   ![Clojars Project](https://img.shields.io/clojars/v/org.clojars.sstraust/deft.svg?color=89f) -->
 
 
