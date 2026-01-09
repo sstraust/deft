@@ -3,7 +3,6 @@
 <!--   ![Clojars Project](https://img.shields.io/clojars/v/org.clojars.sstraust/deft.svg?color=89f) -->
 
 
-
 A collection of macros designed to address issues with objects in Clojure.
 
 #### Example Syntax
@@ -15,11 +14,7 @@ A collection of macros designed to address issues with objects in Clojure.
   (witht [Circle circle1]
 	 (str position ": " radius)) ; => [1 2]: 12
 ```
-
-#### Installation
-```
-org.clojars.sstraust/deft {:mvn/version "0.1.2"}
-```
+jump to: [installation](#Installation)
  
 #### What's wrong with records and protocols?
 - Records are not REPL friendly. If you redefine a method inside of a Clojure record, it does not take effect until that record is reinstantiated.
@@ -222,6 +217,10 @@ note: currently proto implementations use witht for destructuring, and do not ha
 In defmethod, Circle is also the dispatch value, so it describes what *type* of thing you're defining, and is in some sense part of the _name_ of what you are trying to implement. In defnt, the fact that you're using Circle destructuring under the hood is an implementation detail, and so it belongs with the argument list (and after any docstrings). I know it seems strange to have two styles, but I thought long and hard about this, and decided this was the best approach for code readability, especially for scanning large existing files to see how they work.
 -->
 
+#### Installation
+```
+org.clojars.sstraust/deft {:mvn/version "0.1.2"}
+```
 
 #### Copy clj-kondo deps
 ```clj-kondo --copy-configs --dependencies --lint "$(clojure -Spath)"```
