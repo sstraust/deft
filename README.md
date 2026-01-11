@@ -236,6 +236,8 @@ after installing this library, you may want to run this command to copy the clj-
 - Currently the deft constructor function only defines a Malli schema, and only checks that you've supplied all the map's keys as input if you instrument the Malli schema. you should not depend on this behavior (i.e. you should not intentionally not instrument a constructor, and then provide partial fragments of the type's fields, because we may add additional checks for this in the future). You also should not depend directly on the format of the constructor's spec beyond basic instrumentation.
 - currently we do not enforce that protocols cannot define _additional_ methods. i.e. we don't enforce that all methods defined inside of deft must appear in the defp definition for the protocol, but plan to in the future.
 - we also may plan to add in the future the ability to define headless methods on a deft type, that are not associated with any particular protocol, though the use-case for this is largely solved by defnt
+- we may add derives behavior for records that implement a protocol, or protocols that extend another protocol. i.e. we may make it such that "::Rectangle" derives from "::Shape" if Rectangle implements shape.
+- '-' is considered a reserved keyword in argument lists when using deft. we may add special '-' syntax when defining malli schema behavior on protocols, or within defnt functions. we may also support ':-' syntax in addition to '-'
 
 
 In general, the behavior documented as ```^:api-spec``` in our tests is stuff that I intend to be stable and will be hesitant/reluctant to change. If you want to know whether certain behavior is part of the library/intentional, check to see if there is a test for it that is designated with ```^:api-spec```.
