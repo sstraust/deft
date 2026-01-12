@@ -19,7 +19,7 @@ A collection of macros designed to address issues with objects in Clojure.
 ```
 org.clojars.sstraust/deft {:mvn/version "0.1.2"}
 ```
-
+[youtube tutorial](https://www.youtube.com/watch?v=dlW6YzwUZ-M)
 #### What's wrong with records and protocols?
 - Records are not REPL friendly. If you redefine a method inside of a Clojure record, it does not take effect until that record is reinstantiated.
 - Records use single : keywords for field access, making programs difficult to refactor.
