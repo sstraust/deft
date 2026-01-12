@@ -42,6 +42,11 @@ org.clojars.sstraust/deft {:mvn/version "0.1.2"}
 - clj-kondo macroexpansions for deft, defp, witht, and defnt
 - (planned) additional clj-kondo linters to verify types are fully and correctly defined.
 
+#### Is it easy to use?
+Yes. 
+
+The syntax looks like defprotocol and defrecord, so if you know how to use defprotocol and defrecord, then you know how to use defp and deft.
+
 ## Key Features
 
 #### deft
