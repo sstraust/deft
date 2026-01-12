@@ -44,6 +44,9 @@ org.clojars.sstraust/deft {:mvn/version "0.1.2"}
 #### Is it easy to use?
 Yes. The syntax looks like defprotocol and defrecord, so if you know how to use those, then you know how to use defp and deft.
 
+#### Does this work in Clojurescript?
+Yes. Though you need to ```:require```  ```[malli.core]``` and ```[deft.core-shared]``` in addition to ```:require-macros``` ```[deft.core]```.
+
 ## Key Features
 
 #### deft
