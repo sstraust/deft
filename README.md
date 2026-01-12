@@ -36,7 +36,7 @@ org.clojars.sstraust/deft {:mvn/version "0.1.2"}
 
 
 #### What does this library provide?
-- An easy-to-use macro, **deft**, that defines a type, creates an associated Malli schema, creates a constructor, and allows you to specify what Multimethods, or Multimethod collections that type must implement.
+- **deft**, an easy-to-use macro that defines a type, creates an associated Malli schema, creates a constructor, and allows you to specify what Multimethods, or Multimethod collections that type must implement.  *You call it just like defrecord, using the same familiar syntax*.
 - A macro **witht** that takes a type as input, and automatically destructures the fields of that type, similar to clojure records.
 - A macro **defp** which lets you define and implement protocols as collections of multimethods.
 - clj-kondo macroexpansions for deft, defp, witht, and defnt
