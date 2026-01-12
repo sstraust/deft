@@ -44,9 +44,6 @@ org.clojars.sstraust/deft {:mvn/version "0.1.2"}
 #### Is it easy to use?
 Yes. The syntax looks like defprotocol and defrecord, so if you know how to use those, then you know how to use defp and deft.
 
-#### Does this work in Clojurescript?
-Yes. Though you need to :require  [malli.core] and [deft.core-shared] in addition to :require-macros [deft.core].
-
 ## Key Features
 
 #### deft
@@ -78,6 +75,9 @@ We go into detail on this in the defp section, but provide an example of the syn
    Shape
    (area [this] (* pi radius radius)))
 ```
+
+##### Does this work in Clojurescript?
+Yes. Though you need to :require  [malli.core] and [deft.core-shared] in addition to :require-macros [deft.core].
 
 note: Currently the Malli schema for the constructor ```(>Circle :position [1 2] :radius 2)```, requires that the keys be passed in the same order they appear in deft (:position first, :radius second), due to limitations of the Malli framework (https://github.com/metosin/malli/issues/994, https://github.com/metosin/malli/issues/1003 )
 
