@@ -42,7 +42,7 @@ org.clojars.sstraust/deft {:mvn/version "0.1.2"}
 - (planned) additional clj-kondo linters to verify types are fully and correctly defined.
 
 #### Is it easy to use?
-Yes. ---- The syntax looks like defprotocol and defrecord, so if you know how to use those, then you know how to use defp and deft.
+Yes. The syntax looks like defprotocol and defrecord, so if you know how to use those, then you know how to use defp and deft.
 
 ## Key Features
 
