@@ -3,11 +3,7 @@
 
 
 (def lib 'sstraust/deft)
-<<<<<<< HEAD
 (def version "0.1.2") ;; or read from file, etc
-=======
-(def version "0.1.1") ;; or read from file, etc
->>>>>>> 23243eaf (deploy to clojars)
 (def class-dir "target/classes")
 (def jar-file (format "target/%s-%s.jar" (name lib) version))
 
