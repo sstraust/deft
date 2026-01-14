@@ -1,4 +1,7 @@
+
 # Deft
+<!--   ![Clojars Project](https://img.shields.io/clojars/v/org.clojars.sstraust/deft.svg?color=89f) -->
+
 
 A collection of macros designed to address issues with objects in Clojure.
 
@@ -12,6 +15,11 @@ A collection of macros designed to address issues with objects in Clojure.
 	 (str position ": " radius)) ; => [1 2]: 12
 ```
 
+#### Installation
+```
+org.clojars.sstraust/deft {:mvn/version "0.1.2"}
+```
+[on youtube](https://www.youtube.com/watch?v=dlW6YzwUZ-M)
 #### What's wrong with records and protocols?
 - Records are not REPL friendly. If you redefine a method inside of a Clojure record, it does not take effect until that record is reinstantiated.
 - Records use single : keywords for field access, making programs difficult to refactor.
@@ -27,11 +35,14 @@ A collection of macros designed to address issues with objects in Clojure.
 
 
 #### What does this library provide?
-- An easy-to-use macro, **deft**, that defines a type, creates an associated Malli schema, creates a constructor, and allows you to specify what Multimethods, or Multimethod collections that type must implement.
+- An easy-to-use macro, **deft**,  that defines a type, creates an associated Malli schema, creates a constructor, and allows you to specify what Multimethods, or Multimethod collections that type must implement.
 - A macro **witht** that takes a type as input, and automatically destructures the fields of that type, similar to clojure records.
 - A macro **defp** which lets you define and implement protocols as collections of multimethods.
-- clj-kondo macroexpansions for deft, defp, witht, and defnt
+- clj-kondo macroexpansions for deft, defp, witht, and defnt.
 - (planned) additional clj-kondo linters to verify types are fully and correctly defined.
+
+#### Is it easy to use?
+Yes. The syntax looks like defprotocol and defrecord, so if you know how to use those, then you know how to use defp and deft.
 
 ## Key Features
 
@@ -64,6 +75,9 @@ We go into detail on this in the defp section, but provide an example of the syn
    Shape
    (area [this] (* pi radius radius)))
 ```
+
+##### Does this work in Clojurescript?
+Yes. Though you need to :require  [malli.core] and [deft.core-shared] in addition to :require-macros [deft.core].
 
 note: Currently the Malli schema for the constructor ```(>Circle :position [1 2] :radius 2)```, requires that the keys be passed in the same order they appear in deft (:position first, :radius second), due to limitations of the Malli framework (https://github.com/metosin/malli/issues/994, https://github.com/metosin/malli/issues/1003 )
 
@@ -227,6 +241,8 @@ after installing this library, you may want to run this command to copy the clj-
 - Currently the deft constructor function only defines a Malli schema, and only checks that you've supplied all the map's keys as input if you instrument the Malli schema. you should not depend on this behavior (i.e. you should not intentionally not instrument a constructor, and then provide partial fragments of the type's fields, because we may add additional checks for this in the future). You also should not depend directly on the format of the constructor's spec beyond basic instrumentation.
 - currently we do not enforce that protocols cannot define _additional_ methods. i.e. we don't enforce that all methods defined inside of deft must appear in the defp definition for the protocol, but plan to in the future.
 - we also may plan to add in the future the ability to define headless methods on a deft type, that are not associated with any particular protocol, though the use-case for this is largely solved by defnt
+- we may add derives behavior for records that implement a protocol, or protocols that extend another protocol. i.e. we may make it such that "::Rectangle" derives from "::Shape" if Rectangle implements shape.
+- '-' is considered a reserved keyword in argument lists when using deft. we may add special '-' syntax when defining malli schema behavior on protocols, or within defnt functions. we may also support ':-' syntax in addition to '-'
 
 
 In general, the behavior documented as ```^:api-spec``` in our tests is stuff that I intend to be stable and will be hesitant/reluctant to change. If you want to know whether certain behavior is part of the library/intentional, check to see if there is a test for it that is designated with ```^:api-spec```.
@@ -314,5 +330,4 @@ and then do
 clj -T:build jar
 clj -X:deploy
 ```
-
 
