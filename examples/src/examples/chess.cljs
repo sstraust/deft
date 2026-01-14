@@ -1,25 +1,36 @@
 (ns examples.chess
   (:require
-   [deft.core-cljs]
    [malli.core]
    [easyreagent.components :as er]
    [reagent.core :as r]
    [reagent.dom.client :as rdom-client])
-  (:require-macros [deft.core-cljs :refer [deft witht defp defnt]]))
+  (:require-macros [deft.core :refer [deft witht defp defnt]]))
+
+;; color
+;; pawn, bishop, knight
+(defp PieceType
+  (valid-moves [this game-board location]))
+
+(deft ChessPiece [color - [:enum ::white ::black]
+                  piece-type - ::PieceType])
+
+(deft GameBoard [tiles - [:vector [:vector [:or nil ::ChessPiece]]]
+                 curr-move - [:enum ::white ::black]])
+
+(deft MyMove []
+  PieceType
+  (valid-moves [this game-board location]
+               "test"))
+(valid-moves (>MyMove))
 
 
-(deft GameBoard [tiles
-                 curr-move])
-
-(defn make-new-game []
-  (>GameBoard :tiles
-              [[::W-R ::W-P nil nil nil nil ::W-P ::B-R]
-               [::W-N ::W-P nil nil nil nil ::W-P ::B-N]
-               [::W-B ::W-P nil nil nil nil ::W-P ::B-B]
-               [::W-Q ::W-P nil nil nil nil ::W-P ::B-Q]
-               [::W-K ::W-P nil nil nil nil ::W-P ::B-K]
-               [::W-B ::W-P nil nil nil nil ::W-P ::B-B]
-               [::W-N ::W-P nil nil nil nil ::W-P ::B-N]
-               [::W-R ::W-P nil nil nil nil ::W-P ::B-R]]))
-
-
+(defn display-board [game-board-atom]
+  (witht [GameBoard @game-board-atom]
+    [:h-box
+     (for [x (range (count tiles))]
+       [:v-box
+        (for [y (range (count tiles))]
+          [:div.h-4.w-4
+           (witht [ChessPiece (get-in tiles [x y])]
+                  (str color ":" (name (:type piece-type))))])])]))
+                 

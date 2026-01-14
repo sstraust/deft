@@ -83,40 +83,6 @@
          ~(:extends opts))))))
 
 
-(defn check-implements
-  "Verify that a type T implements a protocol (as defined with defp).
-
-  A protocol is considered satisfied if, for every method in the protocol,
-  there exists a multimethod implementation with dispatch value T
-
-  [obj-type protocol & {:keys [available-methods]}]
-  obj-type: should be the _dispatch value_ that is used for multimethods.
-    for objects defined via deft, this is the _keyword_, so (deft Shape ...)
-    would result in ::Shape
-  protocol: the protocol to implement. If you define it with (defp Drawable ...)
-    it's the variable stored in Drawable
-  available-methods: a list of methods to restrict to. it's like saying, check
-    if this protocol is satisfied, but assume that we can only see the value of
-    these methods. It's useful for checking that all of the methods are defined in the same place
-    (and not sporadically). If its nil, then it does no extra filtering.
-  "
-  [obj-type protocol & {:keys [available-methods]}]
-  (let [available-methods (when available-methods (set available-methods))
-        undefined-methods
-        (into []
-        (remove nil?
-                (map (fn [{::keys [key-fn multimethod] :as method-def}]
-                            (when (or (not (contains?
-                                        (methods multimethod)
-                                        (key-fn obj-type)))
-                                      (and available-methods
-                                           (not (contains? available-methods multimethod))))
-                              method-def))
-                     (::implements-methods protocol))))]
-    (if (not (empty? undefined-methods))
-      (throw (RuntimeException. (str "methods " undefined-methods " is not defined for " obj-type " in protocol " protocol)))
-      true)))
-
 
 (defonce deft-fields-map (ref {}))
 
