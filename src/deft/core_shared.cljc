@@ -161,14 +161,16 @@
         undefined-methods
         (into []
         (remove nil?
-                (map (fn [{::keys [key-fn multimethod] :as method-def}]
+                (map (fn [{:deft.core/keys [key-fn multimethod] :as method-def}]
                             (when (or (not (contains?
                                         (methods multimethod)
                                         (key-fn obj-type)))
                                       (and available-methods
                                            (not (contains? available-methods multimethod))))
                               method-def))
-                     (::implements-methods protocol))))]
+                     (:deft.core/implements-methods protocol))))]
     (if (not (empty? undefined-methods))
-      (throw (RuntimeException. (str "methods " undefined-methods " is not defined for " obj-type " in protocol " protocol)))
+      #?(:clj
+         (throw (RuntimeException. (str "methods " undefined-methods " is not defined for " obj-type " in protocol " protocol)))
+         :cljs (throw (js/Error "failed")))
       true)))
