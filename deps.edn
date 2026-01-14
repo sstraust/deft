@@ -10,7 +10,11 @@
           :exec-fn deps-deploy.deps-deploy/deploy
           :exec-args {:installer :remote
                       :sign-releases? true
+<<<<<<< HEAD
                       :artifact "target/deft-0.1.2.jar"}}
+=======
+                      :artifact "target/deft-0.1.1.jar"}}
+>>>>>>> 23243eaf (deploy to clojars)
   :test {:extra-paths ["test"]
          :extra-deps {io.github.cognitect-labs/test-runner 
                       {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
