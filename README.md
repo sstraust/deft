@@ -77,7 +77,12 @@ We go into detail on this in the defp section, but provide an example of the syn
 ```
 
 ##### Does this work in Clojurescript?
-Yes. Though you need to :require  [malli.core] and [deft.core-shared] in addition to :require-macros [deft.core].
+Yes. Though you need to :require  [malli.core] and [deft.core-shared] in addition to :require-macros [deft.core], and pull the latest patches directly from github:
+```
+io.github.sstraust/deft {:git/sha "1155174fce2c86e4fb6c864a31dcfa8121b3c249"
+                                  :git/url "https://github.com/sstraust/deft.git"}
+```
+i am working on improving this experience.
 
 note: Currently the Malli schema for the constructor ```(>Circle :position [1 2] :radius 2)```, requires that the keys be passed in the same order they appear in deft (:position first, :radius second), due to limitations of the Malli framework (https://github.com/metosin/malli/issues/994, https://github.com/metosin/malli/issues/1003 )
 
