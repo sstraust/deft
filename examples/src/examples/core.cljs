@@ -1,7 +1,6 @@
 (ns examples.core
   (:require
    [examples.tic-tac-toe]
-   [examples.chess]
    [easyreagent.components :as er]
    [reagent.core :as r]
    [reagent.dom.client :as rdom-client]))
