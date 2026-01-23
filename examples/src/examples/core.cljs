@@ -1,6 +1,7 @@
 (ns examples.core
   (:require
    [examples.tic-tac-toe]
+   [examples.chess]
    [easyreagent.components :as er]
    [reagent.core :as r]
    [reagent.dom.client :as rdom-client]))
@@ -14,5 +15,5 @@
    react-root
    [component]))
 
-(load-react examples.tic-tac-toe/main-game-view)
+(load-react examples.chess/main-game-view)
 
