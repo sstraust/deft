@@ -24,3 +24,4 @@ examples/.shadow-cljs
 .#*
 *.pom.asc
 .clj-kondo
+examples/.lsp/.cache
