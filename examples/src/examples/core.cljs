@@ -1,8 +1,10 @@
 (ns examples.core
   (:require
    [examples.tic-tac-toe]
+   [examples.chess]
    [easyreagent.components :as er]
    [reagent.core :as r]
+   [malli.dev.cljs :as dev]
    [reagent.dom.client :as rdom-client]))
 
 
@@ -14,5 +16,7 @@
    react-root
    [component]))
 
-(load-react examples.tic-tac-toe/main-game-view)
+(defn load-page []
+  (dev/start!)
+  (load-react examples.chess/main-game-view))
 
