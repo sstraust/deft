@@ -1,13 +1,8 @@
 (ns examples.chess
   (:require
-   [malli.core]
-   [deft.core-shared]
+   [deft.core :refer [deft witht defp defnt]]
    [easyreagent.components :as er]
-   [reagent.core :as r]
-   [reagent.dom.client :as rdom-client]
-   [malli.instrument :as mi]
-   [malli.clj-kondo :as mc])
-  (:require-macros [deft.core :refer [deft witht defp defnt]]))
+   [reagent.core :as r]))
 
 
 (deft ChessMove [piece start-location end-location])
