@@ -65,6 +65,9 @@
     `(do
        ~@(for [method (vals sigs)]
            `(defmulti ~(symbol (str  (:name method))) (fn [~'this & ~'args] (or (:type ~'this) (type ~'this)))))
+
+       (swap! deft.core-shared/malli-registry-atom assoc ~(keyword (name (str *ns*)) (name protocol-name))
+              [:fn (fn [x#] (isa? (:type x#) ~(keyword (name (str *ns*)) (name protocol-name))))])
        
        (def ~protocol-name
          (apply merge-with concat
@@ -171,14 +174,14 @@
               (witht [~type-obj ~(first (second impl))]
                 ~@(drop 2 impl))))
        ~@(for [[interface-name interface-impls] (deft-parse-impls record-implementations)]
-           `(check-implements ~type-name ~interface-name
+           `(do (check-implements ~type-name ~interface-name
                               :available-methods
                               ~(cond
                                 (= :all (:allows-external (::opts interface-impls))) nil
                                 :else (into []
                                              (concat (:allows-external (::opts interface-impls))
-                                                     (map (fn [impl] (get-method-impl-name interface-name impl &env)) (::impls interface-impls)))))))
-       ))
+                                                     (map (fn [impl] (get-method-impl-name interface-name impl &env)) (::impls interface-impls))))))
+                (derive ~type-name ~(keyword (name (str *ns*)) (name interface-name)))))))
 
 ;; TODO!! Check what the print methods should be for cljs
 (defmacro define-record-like-print-methods [type-name]
@@ -306,5 +309,6 @@
 
 
 
-  
+(def get-deft-mutable-registry deft.core-shared/get-deft-mutable-registry)
+(def use-deft-malli-registry! deft.core-shared/use-deft-malli-registry!)
 

@@ -4,7 +4,11 @@
 (ns deft.core-shared
   (:require
    #?(:clj [potemkin.collections :refer [def-map-type]])
+   [malli.registry :as mr]
+   [malli.core :as m]
    [clojure.pprint :as pprint]))
+
+(def malli-registry-atom (atom {}))
 
 #?(:clj
    (def-map-type TypeMap [m mta]
@@ -177,3 +181,15 @@
          (throw (RuntimeException. (str "methods " undefined-methods " is not defined for " obj-type " in protocol " protocol)))
          :cljs (throw (js/Error "failed")))
       true)))
+
+(defn get-deft-mutable-registry
+  "Note that this is the mutable registry only, and
+  does _not_ include the default schemas."
+  []
+  (mr/mutable-registry malli-registry-atom))
+
+(defn use-deft-malli-registry! []
+  (mr/set-default-registry!
+   (mr/composite-registry
+    (m/default-schemas)
+    (mr/mutable-registry malli-registry-atom))))
