@@ -3,11 +3,10 @@
 
 
 (def lib 'sstraust/deft)
-(def version "0.1.2") ;; or read from file, etc
+(def version "0.1.4")
 (def class-dir "target/classes")
 (def jar-file (format "target/%s-%s.jar" (name lib) version))
 
-;; delay to defer side effects (artifact downloads)
 (def basis (delay (b/create-basis {:project "deps.edn"})))
 
 (defn clean [_]

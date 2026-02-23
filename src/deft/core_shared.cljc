@@ -182,13 +182,16 @@
          :cljs (throw (js/Error "failed")))
       true)))
 
-(defn get-deft-mutable-registry
+
+;; note this uses the "-internal" suffix to support old core-shared
+;; import style
+(defn get-deft-mutable-registry-internal
   "Note that this is the mutable registry only, and
   does _not_ include the default schemas."
   []
   (mr/mutable-registry malli-registry-atom))
 
-(defn use-deft-malli-registry! []
+(defn use-deft-malli-registry-internal! []
   (mr/set-default-registry!
    (mr/composite-registry
     (m/default-schemas)
