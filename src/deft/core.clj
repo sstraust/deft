@@ -66,8 +66,6 @@
        ~@(for [method (vals sigs)]
            `(defmulti ~(symbol (str  (:name method))) (fn [~'this & ~'args] (or (:type ~'this) (type ~'this)))))
 
-       ;; how do I test this?
-       ;; I also need derives behavior
        (swap! deft.core-shared/malli-registry-atom assoc ~(keyword (name (str *ns*)) (name protocol-name))
               [:fn (fn [x#] (isa? (:type x#) ~(keyword (name (str *ns*)) (name protocol-name))))])
        
