@@ -2,6 +2,7 @@
   (:require
    [clojure.test :refer :all]
    [deft.core :refer :all :as deft]
+   [deft.core-shared :as core-shared]
    [deft.deftest-external-ns-helper :as deftest-external-ns-helper]
    [malli.core]
    [malli.instrument :as mi]))
@@ -351,7 +352,7 @@
     (defmethod my-method23_1 ::WowzaImpl23_1 [this] "hi")
     
     (deft WowzaImpl23_1 []
-      WowzaImpl23_1 :allows-external [my-method23_1])
+      Wowza23_1 :allows-external [my-method23_1])
 
     (is (= (my-method23_1 (>WowzaImpl23_1)) "hi")))
 
@@ -574,11 +575,33 @@
       
 
       
+
+
+;; Test 30
+(deftest protocol-malli-registry-test
+  (testing "test that clj-kondo keyword exists for a newly defined protocol"
+    (defp ExampleProtocol30)
+    (is (contains? @core-shared/malli-registry-atom ::ExampleProtocol30))))
+
+;; Test 31
+(deftest protocol-malli-registry-test ^:api-spec
+  (testing "test that type checking succeeds for a derived type"
+    (use-deft-malli-registry!)
+    (defp ExampleProtocol31)
+    (deft ExampleType31 []
+      ExampleProtocol31)
+    (is (= true (malli.core/validate ::ExampleProtocol31 (>ExampleType31)))))
+  (testing "test that type checking fails when the protocol is not implemented"
+    (use-deft-malli-registry!)
+    (defp ExampleProtocol31_2)
+    (deft ExampleType31_2 [])
+    (is (= false (malli.core/validate ::ExampleProtocol31_2 (>ExampleType31_2))))))
     
+    
+
       
-      
-    
-    
+
+
 
 
 ;; (eval '(deft Wowza22Impl_2 []
@@ -666,11 +689,25 @@
 
 
 
-;; TODO tests for record-like:
-;;  -- Create tests to verify printing behavior
-;;  -- Create tests to verify that objects without the same type
-;;       are not considered equal
-;;  -- Create a fragment type to represent a typemap style object
-;;       that retains its type when keys are dissoced. you are creating
-;;       potentially more issues and complexity, because now you need to
-;;       define equality for this relation. maybe ignore this thing for now
+
+
+;; ;; TODO tests for record-like:
+;; ;;  -- Create tests to verify printing behavior
+;; ;;  -- Create tests to verify that objects without the same type
+;; ;;       are not considered equal
+;; ;;  -- Create a fragment type to represent a typemap style object
+;; ;;       that retains its type when keys are dissoced. you are creating
+;; ;;       potentially more issues and complexity, because now you need to
+;; ;;       define equality for this relation. maybe ignore this thing for now
+;; (macroexpand-1
+;;  '(deft Test4Circle2 []
+;;     Shape :allows-external :all))
+;; (macroexpand-1 '(deft.core/define-proto-implementations Test4Circle2 :deft.deft-test/Test4Circle2 Shape :allows-external :all))
+
+;; (do
+;;   (do
+;;     (core-shared/check-implements :deft.deft-test/Test4Circle2 Shape :available-methods nil)
+;;     (clojure.core/derive :deft.deft-test/Test4Circle2 :deft.deft-test/Shape)))
+
+;; (isa? :deft.deft-test/Test4Circle2 :deft.deft-test/Shape)
+

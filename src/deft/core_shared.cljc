@@ -6,6 +6,8 @@
    #?(:clj [potemkin.collections :refer [def-map-type]])
    [clojure.pprint :as pprint]))
 
+(def malli-registry-atom (atom {}))
+
 #?(:clj
    (def-map-type TypeMap [m mta]
      (get [_ k default-value]
