@@ -17,7 +17,7 @@ A collection of macros designed to address issues with objects in Clojure.
 
 #### Installation
 ```
-org.clojars.sstraust/deft {:mvn/version "0.1.2"}
+org.clojars.sstraust/deft {:mvn/version "0.1.4"}
 ```
 [on youtube](https://www.youtube.com/watch?v=dlW6YzwUZ-M)
 #### What's wrong with records and protocols?
@@ -77,12 +77,7 @@ We go into detail on this in the defp section, but provide an example of the syn
 ```
 
 ##### Does this work in Clojurescript?
-Yes. Though you need to :require  [malli.core] and [deft.core-shared] in addition to :require-macros [deft.core], and pull the latest patches directly from github:
-```
-io.github.sstraust/deft {:git/sha "1155174fce2c86e4fb6c864a31dcfa8121b3c249"
-                                  :git/url "https://github.com/sstraust/deft.git"}
-```
-i am working on improving this experience.
+Yes.
 
 note: Currently the Malli schema for the constructor ```(>Circle :position [1 2] :radius 2)```, requires that the keys be passed in the same order they appear in deft (:position first, :radius second), due to limitations of the Malli framework (https://github.com/metosin/malli/issues/994, https://github.com/metosin/malli/issues/1003 )
 
@@ -199,6 +194,16 @@ by default any methods without an explicit namespace prefix are namespaced to th
 
 
 note: currently proto implementations use witht for destructuring, and do not have support for allow-overrides/skip-fields. I am planning to add this in a future release
+
+
+##### malli regsitry and derives behavior
+creating a protocol via defp adds it to the project's malli registry, which you can access via ```(get-deft-mutable-registry)```, or install directly using ```(use-deft-malli-registry!)```. 
+
+For example, if you do ```(defp MyProtocol)```, it will add ```::MyProtocol``` to the malli registry, and be valid if the input type implements that protocol.
+
+additionally, when you do ```(deft MyImplementation [] MyProtocol)```, ```::MyImplementation``` derives from ```::MyProtocol```
+
+
 <!-- !!!! TODO Actually add this feature!!! -->
 
 
@@ -246,7 +251,6 @@ after installing this library, you may want to run this command to copy the clj-
 - Currently the deft constructor function only defines a Malli schema, and only checks that you've supplied all the map's keys as input if you instrument the Malli schema. you should not depend on this behavior (i.e. you should not intentionally not instrument a constructor, and then provide partial fragments of the type's fields, because we may add additional checks for this in the future). You also should not depend directly on the format of the constructor's spec beyond basic instrumentation.
 - currently we do not enforce that protocols cannot define _additional_ methods. i.e. we don't enforce that all methods defined inside of deft must appear in the defp definition for the protocol, but plan to in the future.
 - we also may plan to add in the future the ability to define headless methods on a deft type, that are not associated with any particular protocol, though the use-case for this is largely solved by defnt
-- we may add derives behavior for records that implement a protocol, or protocols that extend another protocol. i.e. we may make it such that "::Rectangle" derives from "::Shape" if Rectangle implements shape.
 - '-' is considered a reserved keyword in argument lists when using deft. we may add special '-' syntax when defining malli schema behavior on protocols, or within defnt functions. we may also support ':-' syntax in addition to '-'
 
 
@@ -335,4 +339,9 @@ and then do
 clj -T:build jar
 clj -X:deploy
 ```
+
+# ChangeLog
+0.1.4:
+- add cljs file to improve experience of importing in clojurescript
+- add malli registry for protocols
 
