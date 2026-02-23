@@ -5,6 +5,7 @@
    [easyreagent.components :as er]
    [reagent.core :as r]
    [malli.dev.cljs :as dev]
+   [deft.core :as deft]
    [reagent.dom.client :as rdom-client]))
 
 
@@ -17,6 +18,5 @@
    [component]))
 
 (defn load-page []
-  (dev/start!)
   (load-react examples.chess/main-game-view))
 

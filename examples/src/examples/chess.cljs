@@ -1,12 +1,21 @@
 (ns examples.chess
   (:require
-   [deft.core :refer [deft witht defp defnt]]
+   [malli.instrument :as mi]
+   [deft.core :refer [defnt defp deft witht]]
    [easyreagent.components :as er]
+   [malli.dev.cljs :as dev]
+   [malli.dev.pretty :as pretty]
    [reagent.core :as r]))
 
 
+;; (mi/collect!)
+;; (mi/instrument!)
+
+(deft.core/use-deft-malli-registry!)
+
 (deft ChessMove [piece start-location end-location])
-(deft ChessPiece [color piece-type])
+(deft ChessPiece [color - [:enum ::white ::black]
+                  piece-type - [:and ::MovablePiece ::PieceType]])
 
 
 (deft ChessBoard [tiles - [:vector [:vector [:or :nil ChessPiece]]]
@@ -61,7 +70,8 @@
 
    (is-piece-in-the-way? game-board start-location end-location)
 
-   (is-valid-end-location? game-board start-location end-location))))
+   (is-valid-end-location? game-board start-location end-location)))
+  )
 
 (deft Bishop []
   PieceType
@@ -335,6 +345,8 @@
                                                             :piece-type piece-type)))
     @empty-board-atom))
       
+
+(dev/start! {:report (pretty/reporter)})
 
 
 (def curr-game-atom (r/atom (>ChessBoard :tiles (make-game-tiles)
