@@ -687,7 +687,6 @@
 
 
 
-<<<<<<< HEAD
 ;; TODO tests for record-like:
 ;;  -- Create tests to verify printing behavior
 ;;  -- Create tests to verify that objects without the same type
@@ -696,29 +695,3 @@
 ;;       that retains its type when keys are dissoced. you are creating
 ;;       potentially more issues and complexity, because now you need to
 ;;       define equality for this relation. maybe ignore this thing for now
-=======
-
-
-
-
-;; ;; TODO tests for record-like:
-;; ;;  -- Create tests to verify printing behavior
-;; ;;  -- Create tests to verify that objects without the same type
-;; ;;       are not considered equal
-;; ;;  -- Create a fragment type to represent a typemap style object
-;; ;;       that retains its type when keys are dissoced. you are creating
-;; ;;       potentially more issues and complexity, because now you need to
-;; ;;       define equality for this relation. maybe ignore this thing for now
-;; (macroexpand-1
-;;  '(deft Test4Circle2 []
-;;     Shape :allows-external :all))
-;; (macroexpand-1 '(deft.core/define-proto-implementations Test4Circle2 :deft.deft-test/Test4Circle2 Shape :allows-external :all))
-
-;; (do
-;;   (do
-;;     (core-shared/check-implements :deft.deft-test/Test4Circle2 Shape :available-methods nil)
-;;     (clojure.core/derive :deft.deft-test/Test4Circle2 :deft.deft-test/Shape)))
-
-;; (isa? :deft.deft-test/Test4Circle2 :deft.deft-test/Shape)
-
->>>>>>> d9f0c872 (add malli registry for protocols)
