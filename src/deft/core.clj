@@ -67,7 +67,7 @@
            `(defmulti ~(symbol (str  (:name method))) (fn [~'this & ~'args] (or (:type ~'this) (type ~'this)))))
 
        (swap! deft.core-shared/malli-registry-atom assoc ~(keyword (name (str *ns*)) (name protocol-name))
-              [:fn (fn [x#] (isa? (:type x#) ~(keyword (name (str *ns*)) (name protocol-name))))])
+              [:fn (fn [x#] (isa? (or (:type x#) (type x#)) ~(keyword (name (str *ns*)) (name protocol-name))))])
        
        (def ~protocol-name
          (apply merge-with concat
@@ -82,7 +82,8 @@
                       `{::multimethod ~(:method external-method)
                         ::key-fn ~(:key-fn external-method)}
                       `{::multimethod ~external-method
-                        ::key-fn identity}))))}
+                        ::key-fn identity}))))
+          ::name ~(keyword (name (str *ns*)) (name protocol-name))}
          ~(:extends opts))))))
 
 
@@ -181,7 +182,7 @@
                                 :else (into []
                                              (concat (:allows-external (::opts interface-impls))
                                                      (map (fn [impl] (get-method-impl-name interface-name impl &env)) (::impls interface-impls))))))
-                (derive ~type-name ~(keyword (name (str *ns*)) (name interface-name)))))))
+                (derive ~type-name (::name ~interface-name))))))
 
 ;; TODO!! Check what the print methods should be for cljs
 (defmacro define-record-like-print-methods [type-name]
@@ -221,20 +222,25 @@
   (let [type-name (keyword (name (str *ns*)) (name class-name))
         fields-to-types (loop [inp-list inp-fields-list
                                outp-list []]
+                          (let [keyword-args (take-while keyword? inp-list)
+                                inp-list (drop-while keyword? inp-list)]
                           (cond
                             (= (second inp-list) '-)
                             (if (< (count inp-list) 3)
                               (throw (Exception. "wrong number of arguments to type expression"))
-                              (recur (drop 3 inp-list) (concat outp-list [[(first inp-list) (nth inp-list 2)]])))
+                              (recur (drop 3 inp-list) (concat outp-list [[(first inp-list) (nth inp-list 2)
+                                                                           (set keyword-args)]])))
 
                             (empty? inp-list)
                             outp-list
 
-                            :else (recur (drop 1 inp-list) (concat outp-list [[(first inp-list) :any]]))))
+                            :else (recur (drop 1 inp-list) (concat outp-list [[(first inp-list) :any
+                                                                               (set keyword-args)
+                                                                               ]])))))
         fields-list (mapv first fields-to-types)
 
         tagged-args (set (take-while #(contains? #{:record-like} %) record-implementations))
-        keywords-args (take-while (comp keyword? first) (partition 2 record-implementations))
+        keywords-args (take-while (comp keyword? first) (partition 2 (drop (count tagged-args) record-implementations)))
         opts (into {} (into [] (map #(apply vector %) keywords-args)))
         record-implementations (drop (+ (count tagged-args) (* 2 (count keywords-args))) record-implementations)]
     (dosync
@@ -248,7 +254,8 @@
                 ;; TODO define the output type as TYPEMAP when doing the record type
                 ;; or maybe just like think really carefully about what this type is, and what it should represent
                 (cons :map
-                      (concat (for [[field type] fields-to-types]
+                      (concat (for [[field type keywords-args] fields-to-types
+                                    :when (not (contains? keywords-args :optional))]
                                 [(keyword (str *ns*) (str field)) type])
                               (when (not (contains? tagged-args :record-like))
                                 [[:type [:= type-name]]])))))
@@ -272,9 +279,12 @@
               ~(into []
                            (cons :cat
                                  (mapcat identity
-                                         (for [[field type] fields-to-types]
-                                           [[:= (keyword (str field))]
-                                            type]))))
+                                         (for [[field type keyword-args] fields-to-types]
+                                           (if (contains? keyword-args :optional)
+                                             [[:? [:cat [:= (keyword (str field))]
+                                                   type]]]
+                                             [[:= (keyword (str field))]
+                                              type])))))
               ~class-name]))))
 
 
