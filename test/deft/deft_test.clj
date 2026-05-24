@@ -654,6 +654,8 @@
          (deft Test4BadSquare [side-length]
            Test4Shape)))
     (defmethod area ::Test4Circle [this] 12)
+    (defp Shape
+      (area [this]))
     (deft Test4Circle []
       Shape :allows-external [area])
     (is (= (area (>Test4Circle)) 12))
