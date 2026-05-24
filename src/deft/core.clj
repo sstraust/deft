@@ -83,8 +83,8 @@
                         ::key-fn ~(:key-fn external-method)}
                       `{::multimethod ~external-method
                         ::key-fn identity}))))
-          ::name ~(keyword (name (str *ns*)) protocol-name)}
-         ~(:extends opts))))))
+          ::name ~(keyword (name (str *ns*)) (str protocol-name))}
+         (map #(select-keys % [::implements-methods]) ~(:extends opts)))))))
 
 
 
