@@ -82,7 +82,8 @@
                       `{::multimethod ~(:method external-method)
                         ::key-fn ~(:key-fn external-method)}
                       `{::multimethod ~external-method
-                        ::key-fn identity}))))}
+                        ::key-fn identity}))))
+          ::name ~(keyword (name (str *ns*)) (name protocol-name))}
          ~(:extends opts))))))
 
 
@@ -181,7 +182,7 @@
                                 :else (into []
                                              (concat (:allows-external (::opts interface-impls))
                                                      (map (fn [impl] (get-method-impl-name interface-name impl &env)) (::impls interface-impls))))))
-                (derive ~type-name ~(keyword (name (str *ns*)) (name interface-name)))))))
+                (derive ~type-name (::name ~interface-name))))))
 
 ;; TODO!! Check what the print methods should be for cljs
 (defmacro define-record-like-print-methods [type-name]
