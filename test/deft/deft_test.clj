@@ -690,7 +690,13 @@
       Wowza12
       (deftest-external-ns-helper/my-external-method [this] "wowza"))
     (is (= (deftest-external-ns-helper/my-external-method (>Wowza12Impl))
-           "wowza"))))
+           "wowza")))
+  (testing
+      "Verify that defp derives works from another namespace."
+    (deft Circle12-3 []
+      deftest-external-ns-helper/Shape
+      (test-area [this] "hi"))
+    (is (isa? (:type (>Circle12-3)) ::deftest-external-ns-helper/Shape))))
 
 
 
