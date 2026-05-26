@@ -17,7 +17,7 @@
                           :radius 12))
     (witht [Circle circle1]
       (is (= position [1 2])
-          (= radius 12)))
+          (= radius 12))))
 
   (testing
       "test that schema constructor respects malli type checking"
@@ -54,7 +54,7 @@
          Exception
          (deft BadSquare [side-length]
            Shape3
-           (perimeter [this] (* 4 side-length))))))))
+           (perimeter [this] (* 4 side-length)))))))
 
 
 
