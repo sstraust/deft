@@ -17,7 +17,7 @@
                           :radius 12))
     (witht [Circle circle1]
       (is (= position [1 2])
-          (= radius 12))))
+          (= radius 12)))
 
   (testing
       "test that schema constructor respects malli type checking"
@@ -54,7 +54,7 @@
          Exception
          (deft BadSquare [side-length]
            Shape3
-           (perimeter [this] (* 4 side-length)))))))
+           (perimeter [this] (* 4 side-length))))))))
 
 
 
@@ -605,6 +605,12 @@
     
 
       
+(deftest keyword-fields-test
+  (testing "test the behavior of allowing namespaced kyword field-names"
+    (deft Circle32 [:test/pos - :double])
+    (is (= (>Circle32 :test/pos 12.0)
+           {:test/pos 12.0, :type :deft.deft-test/Circle32}))))
+           
 
 
 
@@ -700,6 +706,8 @@
 
 
 
+
+
 ;; TODO tests for record-like:
 ;;  -- Create tests to verify printing behavior
 ;;  -- Create tests to verify that objects without the same type
@@ -708,3 +716,4 @@
 ;;       that retains its type when keys are dissoced. you are creating
 ;;       potentially more issues and complexity, because now you need to
 ;;       define equality for this relation. maybe ignore this thing for now
+ 

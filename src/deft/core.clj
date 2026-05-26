@@ -138,10 +138,11 @@
                                                 (resolve class-name)))) (name :keys))
             ~(into [] (remove
                        (fn [x] (or (contains? skip-fields-set x)
-                                   (not (= (namespace (if (:ns &env)
-                                                        (:name (api/resolve &env class-name))
-                                                        (resolve class-name)))
-                                           (namespace x)))))
+                                   (and (keyword? x)
+                                        (not (= (namespace (if (:ns &env)
+                                                             (:name (api/resolve &env class-name))
+                                                             (resolve class-name)))
+                                                (namespace x))))))
               (get @deft-fields-map
                       (symbol (if (:ns &env)
                                 (:name (api/resolve &env class-name))
