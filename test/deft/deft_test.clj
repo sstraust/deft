@@ -228,7 +228,8 @@
     (is (= MyClass20_1
            {:deft.core/implements-methods
             [{:deft.core/multimethod (eval 'deft.deft-test/my-method)
-              :deft.core/key-fn identity}]})))
+              :deft.core/key-fn identity}]
+            :deft.core/name ::MyClass20_1})))
 
 
   (testing "Test defp output format with external methods"
@@ -240,7 +241,8 @@
             [{:deft.core/multimethod (eval 'deft.deft-test/my-method)
               :deft.core/key-fn identity}
              {:deft.core/multimethod (eval 'deft.deftest-external-ns-helper/my-external-method)
-              :deft.core/key-fn identity}]})))
+              :deft.core/key-fn identity}]
+            :deft.core/name ::MyClass20_2})))
 
   (testing "Test defp output format with empty external methods"
     (defp MyClass20_3
@@ -249,7 +251,8 @@
     (is (= MyClass20_3
            {:deft.core/implements-methods
             [{:deft.core/multimethod (eval 'deft.deft-test/my-method)
-              :deft.core/key-fn identity}]})))
+              :deft.core/key-fn identity}]
+            :deft.core/name ::MyClass20_3})))
 
   (testing "Test defp output format with extends"
     (defp MyClass20_3
@@ -258,7 +261,8 @@
     (is (= MyClass20_3
            {:deft.core/implements-methods
             [{:deft.core/multimethod (eval 'deft.deft-test/my-method)
-              :deft.core/key-fn identity}]})))
+              :deft.core/key-fn identity}]
+            :deft.core/name ::MyClass20_3})))
 
   (testing "Test defp output format with extends"
     (defp MyClass20_base
@@ -273,7 +277,8 @@
             [{:deft.core/multimethod (eval 'deft.deft-test/my-method)
               :deft.core/key-fn identity}
              {:deft.core/multimethod (eval 'deft.deft-test/my-other-method)
-              :deft.core/key-fn identity}]}))))
+              :deft.core/key-fn identity}]
+            :deft.core/name ::MyClass20_extension}))))
 
 ;; Test 21
 (deftest defp-dispatch-type-test ^:api-spec
@@ -649,6 +654,8 @@
          (deft Test4BadSquare [side-length]
            Test4Shape)))
     (defmethod area ::Test4Circle [this] 12)
+    (defp Shape
+      (area [this]))
     (deft Test4Circle []
       Shape :allows-external [area])
     (is (= (area (>Test4Circle)) 12))
@@ -683,7 +690,13 @@
       Wowza12
       (deftest-external-ns-helper/my-external-method [this] "wowza"))
     (is (= (deftest-external-ns-helper/my-external-method (>Wowza12Impl))
-           "wowza"))))
+           "wowza")))
+  (testing
+      "Verify that defp derives works from another namespace."
+    (deft Circle12-3 []
+      deftest-external-ns-helper/Shape
+      (test-area [this] "hi"))
+    (is (isa? (:type (>Circle12-3)) ::deftest-external-ns-helper/Shape))))
 
 
 
