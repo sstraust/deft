@@ -17,7 +17,7 @@ A collection of macros designed to address issues with objects in Clojure.
 
 #### Installation
 ```
-org.clojars.sstraust/deft {:mvn/version "0.1.4"}
+org.clojars.sstraust/deft {:mvn/version "0.1.5"}
 ```
 [on youtube](https://www.youtube.com/watch?v=dlW6YzwUZ-M)
 #### What's wrong with records and protocols?
