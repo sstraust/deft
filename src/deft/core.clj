@@ -137,7 +137,11 @@
                                                 (:name (api/resolve &env class-name))
                                                 (resolve class-name)))) (name :keys))
             ~(into [] (remove
-              (fn [x] (contains? skip-fields-set x))
+                       (fn [x] (or (contains? skip-fields-set x)
+                                   (not (= (namespace (if (:ns &env)
+                                                        (:name (api/resolve &env class-name))
+                                                        (resolve class-name)))
+                                           (namespace x)))))
               (get @deft-fields-map
                       (symbol (if (:ns &env)
                                 (:name (api/resolve &env class-name))
@@ -237,7 +241,10 @@
         tagged-args (set (take-while #(contains? #{:record-like} %) record-implementations))
         keywords-args (take-while (comp keyword? first) (partition 2 record-implementations))
         opts (into {} (into [] (map #(apply vector %) keywords-args)))
-        record-implementations (drop (+ (count tagged-args) (* 2 (count keywords-args))) record-implementations)]
+        record-implementations (drop (+ (count tagged-args) (* 2 (count keywords-args))) record-implementations)
+        is-namespaced-key? (fn [field] (and (keyword? field)
+                                         (namespace field)
+                                         (not (= (namespace field) (name (str *ns*))))))]
     (dosync
      (alter deft-fields-map
             assoc
@@ -250,7 +257,9 @@
                 ;; or maybe just like think really carefully about what this type is, and what it should represent
                 (cons :map
                       (concat (for [[field type] fields-to-types]
-                                [(keyword (str *ns*) (str field)) type])
+                                (if (is-namespaced-key? field)
+                                  [field type]
+                                  [(keyword (str *ns*) (str field)) type]))
                               (when (not (contains? tagged-args :record-like))
                                 [[:type [:= type-name]]])))))
        
@@ -274,7 +283,9 @@
                            (cons :cat
                                  (mapcat identity
                                          (for [[field type] fields-to-types]
-                                           [[:= (keyword (str field))]
+                                           [(if (is-namespaced-key? field)
+                                              [:= field]
+                                              [:= (keyword (str field))])
                                             type]))))
               ~class-name]))))
 

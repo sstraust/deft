@@ -137,7 +137,7 @@
 
 (defn prefix-keys [ns-name m]
   (let [prefix-fn (fn [k]
-                   (if (keyword? k)
+                   (if (and (keyword? k) (not (namespace k)))
                      (keyword (name ns-name) (name k))
                      k))]
     (reduce-kv (fn [acc k v]
