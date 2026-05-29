@@ -232,7 +232,8 @@
            {:deft.core/implements-methods
             [{:deft.core/multimethod (eval 'deft.deft-test/my-method)
               :deft.core/key-fn identity}]
-            :deft.core/name ::MyClass20_1})))
+            :deft.core/name ::MyClass20_1
+            :deft.core/required-keys {}})))
 
 
   (testing "Test defp output format with external methods"
@@ -245,7 +246,8 @@
               :deft.core/key-fn identity}
              {:deft.core/multimethod (eval 'deft.deftest-external-ns-helper/my-external-method)
               :deft.core/key-fn identity}]
-            :deft.core/name ::MyClass20_2})))
+            :deft.core/name ::MyClass20_2
+            :deft.core/required-keys {}})))
 
   (testing "Test defp output format with empty external methods"
     (defp MyClass20_3
@@ -255,7 +257,8 @@
            {:deft.core/implements-methods
             [{:deft.core/multimethod (eval 'deft.deft-test/my-method)
               :deft.core/key-fn identity}]
-            :deft.core/name ::MyClass20_3})))
+            :deft.core/name ::MyClass20_3
+            :deft.core/required-keys {}})))
 
   (testing "Test defp output format with extends"
     (defp MyClass20_3
@@ -265,7 +268,8 @@
            {:deft.core/implements-methods
             [{:deft.core/multimethod (eval 'deft.deft-test/my-method)
               :deft.core/key-fn identity}]
-            :deft.core/name ::MyClass20_3})))
+            :deft.core/name ::MyClass20_3
+            :deft.core/required-keys {}})))
 
   (testing "Test defp output format with extends"
     (defp MyClass20_base
@@ -281,7 +285,8 @@
               :deft.core/key-fn identity}
              {:deft.core/multimethod (eval 'deft.deft-test/my-other-method)
               :deft.core/key-fn identity}]
-            :deft.core/name ::MyClass20_extension}))))
+            :deft.core/name ::MyClass20_extension
+            :deft.core/required-keys {}}))))
 
 ;; Test 21
 (deftest defp-dispatch-type-test ^:api-spec
@@ -722,10 +727,54 @@
     (mi/instrument!)
     (let [exception (is (thrown? clojure.lang.ExceptionInfo
                                  (>Circle32_4 :pos 4 :test/pos "hi")))]
-      (is (= :malli.core/invalid-input (:type (ex-data exception)))))))
+      (is (= :malli.core/invalid-input (:type (ex-data exception))))))
+
+  ;; I think that I disalow this behavior
+  ;; otherwise it's confusing how to build the constructor
+  (testing "test that this works with normally namespaced keys"
+    (deft Circle32_5 [::deftest-external-ns-helper/pos - :double])
+    (mi/instrument!)
+    (is (= (>Circle32_5 ::deftest-external-ns-helper/pos 1.0)
+           {:deft.deftest-external-ns-helper/pos 1.0, :type :deft.deft-test/Circle32_5})))
+
+
+  (testing "test that same namespace keywords are disallowed"
+    (let [exception
+          (binding [*ns* (the-ns 'deft.deft-test)]
+            (is (thrown? Exception (macroexpand '(deft Circle32_6 [::pos - :double])))))]
+      (is (= (.getMessage (ex-cause exception))
+             "cannot use keyword field with same namespace as current. use symbol instead."))))
+
+  (testing "test that unnamespaced keywords are disallowed"
+    (let [exception
+          (binding [*ns* (the-ns 'deft.deft-test)]
+            (is (thrown? Exception (macroexpand '(deft Circle32_6 [:pos - :double])))))]
+      (is (= (.getMessage (ex-cause exception))
+             "keyword fields must be namespaced. we may relax this restriction in the future.")))))
 
 
 
+;; TODO!! test this for namespaced keys!!
+
+
+
+(deftest protocol-fields-test
+  (testing "test that this will work with required fields"
+    (defp Position33 :required-keys [:test1/pos - :double])
+    (deft Circle33 [:test1/pos - :double]
+      Position33)
+    (is (= (>Circle33 :test1/pos 1.0)
+           {:test1/pos 1.0, :type :deft.deft-test/Circle33})))
+
+  (testing "test that this will work with required fields"
+    (defp Position33_2 :required-keys [:test1/pos - :double]
+      (area [this]))
+    (deft Circle33_2 [:test1/pos - :double pos]
+      Position33_2
+      (area [this] (* pos 2)))
+    (is (= (area (>Circle33_2 :test1/pos 1.0 :pos 3))
+           6))))           
+    
 
 ;; TODO tests for record-like:
 ;;  -- Create tests to verify printing behavior
@@ -735,3 +784,8 @@
 ;;       that retains its type when keys are dissoced. you are creating
 ;;       potentially more issues and complexity, because now you need to
 ;;       define equality for this relation. maybe ignore this thing for now
+
+
+
+
+

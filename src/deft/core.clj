@@ -5,6 +5,19 @@
    [malli.core :as m]
    [malli.destructure :as md]))
 
+(defn compute-fields-to-types [inp-fields-list]
+  (into [] (loop [inp-list inp-fields-list
+                               outp-list []]
+                          (cond
+                            (= (second inp-list) '-)
+                            (if (< (count inp-list) 3)
+                              (throw (Exception. "wrong number of arguments to type expression"))
+                              (recur (drop 3 inp-list) (concat outp-list [[(first inp-list) (nth inp-list 2)]])))
+
+                            (empty? inp-list)
+                            outp-list
+
+                            :else (recur (drop 1 inp-list) (concat outp-list [[(first inp-list) :any]]))))))
 
 (defmacro defp
   "Define a (defp) protocol, which is essentially just a list of multimethods.
@@ -70,7 +83,10 @@
               [:fn (fn [x#] (isa? (:type x#) ~(keyword (name (str *ns*)) (name protocol-name))))])
        
        (def ~protocol-name
-         (apply merge-with concat
+         (apply merge-with (fn [& args#]
+                             (if (map? (first args#))
+                               (apply merge args#)
+                               (apply concat args#)))
          {::implements-methods
           ~(into []
                 (concat 
@@ -83,8 +99,9 @@
                         ::key-fn ~(:key-fn external-method)}
                       `{::multimethod ~external-method
                         ::key-fn identity}))))
-          ::name ~(keyword (name (str *ns*)) (name protocol-name))}
-         (map #(select-keys % [::implements-methods]) ~(:extends opts)))))))
+          ::name ~(keyword (name (str *ns*)) (name protocol-name))
+          ::required-keys ~(into {} (compute-fields-to-types (:required-keys opts)))}
+         (map #(select-keys % [::implements-methods ::required-keys]) ~(:extends opts)))))))
 
 
 
@@ -163,7 +180,7 @@
 
 
 
-(defmacro define-proto-implementations [type-obj type-name & record-implementations]
+(defmacro define-proto-implementations [type-obj type-name fields-to-types & record-implementations]
   `(do ~@(for [[interface-name interface-impls] (deft-parse-impls record-implementations)
                impl (::impls interface-impls)]
            ;; get-method-impl-name resolves the method name from the ns where the PROTOCOL was defined
@@ -174,6 +191,7 @@
                 ~@(drop 2 impl))))
        ~@(for [[interface-name interface-impls] (deft-parse-impls record-implementations)]
            `(do (check-implements ~type-name ~interface-name
+                                  :available-fields ~fields-to-types
                               :available-methods
                               ~(cond
                                 (= :all (:allows-external (::opts interface-impls))) nil
@@ -216,20 +234,10 @@
 
 
 
+
 (defmacro deft [class-name inp-fields-list & record-implementations]
   (let [type-name (keyword (name (str *ns*)) (name class-name))
-        fields-to-types (loop [inp-list inp-fields-list
-                               outp-list []]
-                          (cond
-                            (= (second inp-list) '-)
-                            (if (< (count inp-list) 3)
-                              (throw (Exception. "wrong number of arguments to type expression"))
-                              (recur (drop 3 inp-list) (concat outp-list [[(first inp-list) (nth inp-list 2)]])))
-
-                            (empty? inp-list)
-                            outp-list
-
-                            :else (recur (drop 1 inp-list) (concat outp-list [[(first inp-list) :any]]))))
+        fields-to-types (compute-fields-to-types inp-fields-list)
         fields-list (mapv first fields-to-types)
 
         tagged-args (set (take-while #(contains? #{:record-like} %) record-implementations))
@@ -245,15 +253,31 @@
             (symbol (str *ns*) (name class-name))
             fields-list))
     `(do
+
        (def ~class-name
          ~(into []
                 ;; TODO define the output type as TYPEMAP when doing the record type
                 ;; or maybe just like think really carefully about what this type is, and what it should represent
                 (cons :map
                       (concat (for [[field type] fields-to-types]
-                                (if (is-namespaced-key? field)
+                                (do
+                                  (def cc field)
+                                  (def c2 (is-namespaced-key? field))
+                                  (def c3 (name (str *ns*)))
+                                (cond
+                                  (is-namespaced-key? field)
                                   [field type]
-                                  [(keyword (str *ns*) (str field)) type]))
+
+                                  (symbol? field)
+                                  [(keyword (str *ns*) (str field)) type]
+
+                                  (and (keyword? field)
+                                       (namespace field)
+                                       (= (namespace field) (name (str *ns*))))
+                                  (throw (Exception. "cannot use keyword field with same namespace as current. use symbol instead."))
+
+                                  :else
+                                  (throw (Exception. "keyword fields must be namespaced. we may relax this restriction in the future.")))))
                               (when (not (contains? tagged-args :record-like))
                                 [[:type [:= type-name]]])))))
        
@@ -266,7 +290,10 @@
             `(assoc (prefix-keys ~(str *ns*) ~'args-list)
                     :type ~type-name)))
      
-       (define-proto-implementations ~class-name ~type-name ~@record-implementations)
+       (define-proto-implementations ~class-name ~type-name ~(into [] (for [[field type] fields-to-types]
+                                (if (is-namespaced-key? field)
+                                  [field type]
+                                  [(keyword (str *ns*) (str field)) type]))) ~@record-implementations)
        ~(when (contains? tagged-args :record-like)
          `(define-record-like-print-methods ~type-name))
 
