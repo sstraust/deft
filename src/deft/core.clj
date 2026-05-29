@@ -5,6 +5,8 @@
    [malli.core :as m]
    [malli.destructure :as md]))
 
+(def prefix-keys deft.core-shared/prefix-keys)
+
 
 (defmacro defp
   "Define a (defp) protocol, which is essentially just a list of multimethods.
@@ -105,14 +107,15 @@
 (defmacro witht [def-list & code]
   (let [[class-name var-name  & {:keys [allow-overrides skip-fields]}] def-list
         allow-override-set (set allow-overrides)
-        skip-fields-set (set skip-fields)]
-
-    (doseq [class-field (get @deft-fields-map
+        skip-fields-set (set skip-fields)
+        class-fields (filter symbol? (get @deft-fields-map
                              (symbol
                               (if (:ns &env)
                                 (:name (api/resolve &env class-name))
                                 (resolve class-name))
-                              ))]
+                              )))]
+
+    (doseq [class-field class-fields]
       (let [var-name (symbol (str (namespace (symbol
                                               (if (:ns &env)
                                                 (:name (api/resolve &env class-name))
@@ -143,10 +146,7 @@
                                                              (:name (api/resolve &env class-name))
                                                              (resolve class-name)))
                                                 (namespace x))))))
-              (get @deft-fields-map
-                      (symbol (if (:ns &env)
-                                (:name (api/resolve &env class-name))
-                                (resolve class-name))))))}
+              class-fields))}
          ~var-name]
        ~@code)))
 

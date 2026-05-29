@@ -8,6 +8,9 @@
    [malli.instrument :as mi]))
 
 
+
+
+
 (deftest simple-object-test
   (testing 
       "The simplest test we can show! See what's possible with deft!"
@@ -601,30 +604,6 @@
     (defp ExampleProtocol31_2)
     (deft ExampleType31_2 [])
     (is (= false (malli.core/validate ::ExampleProtocol31_2 (>ExampleType31_2))))))
-    
-    
-
-      
-(deftest keyword-fields-test
-  (testing "test the behavior of allowing namespaced kyword field-names"
-    (deft Circle32 [:test/pos - :double])
-    (is (= (>Circle32 :test/pos 12.0)
-           {:test/pos 12.0, :type :deft.deft-test/Circle32}))))
-           
-
-
-
-
-;; (eval '(deft Wowza22Impl_2 []
-;;          Wowza22_2
-;;          (deftest-external-ns-helper/my-external-method [this] "wowza")))
-
-
-    
-    
-    
-
-
 
 
 (deftest dissoc-types-test
@@ -703,6 +682,48 @@
       deftest-external-ns-helper/Shape
       (test-area [this] "hi"))
     (is (isa? (:type (>Circle12-3)) ::deftest-external-ns-helper/Shape))))
+
+    
+    
+      
+(deftest keyword-fields-test
+  (testing "test the behavior of allowing namespaced keyword field-names"
+    (deft Circle32 [:test/pos - :double])
+    (is (= (>Circle32 :test/pos 12.0)
+           {:test/pos 12.0, :type :deft.deft-test/Circle32})))
+
+  (testing "test that you can mix keyword and non-keyword names"
+    (deft Circle32_1 [pos :test/pos - :double])
+    (is (= (>Circle32_1 :pos 4 :test/pos 12.0)
+           {:test/pos 12.0, ::pos 4 :type :deft.deft-test/Circle32_1})))
+
+  (testing "test that you can still implement witht"
+    (deft Circle32_2 [pos :test/pos - :double])
+    (is (= (witht [Circle32_2 (>Circle32_2 :pos 4 :test/pos 12.0)]
+             pos) 4)))
+  (testing "test that this can still implement a protocol"
+    (defp Shape32_3
+      (area [this]))
+    (deft Circle32_3 [pos :test/pos - :double]
+      Shape32_3
+      (area [this] (* 2 pos)))
+
+    (is (= (area (>Circle32_3 :pos 4 :test/pos 12.0)) 8)))
+
+  (testing "test that this will fail if you don't supply a required key"
+    (deft Circle32_4 [pos :test/pos - :double])
+    (mi/instrument!)
+    (let [exception (is (thrown? clojure.lang.ExceptionInfo
+                                 (>Circle32_4 :pos 4)))]
+      (is (= :malli.core/invalid-arity (:type (ex-data exception))))))
+
+  (testing "test that this will fail if you don't provide the right type"
+    (deft Circle32_4 [pos :test/pos - :double])
+    (mi/instrument!)
+    (let [exception (is (thrown? clojure.lang.ExceptionInfo
+                                 (>Circle32_4 :pos 4 :test/pos "hi")))]
+      (is (= :malli.core/invalid-input (:type (ex-data exception)))))))
+
 
 
 
