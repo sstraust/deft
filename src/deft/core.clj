@@ -5,8 +5,6 @@
    [malli.core :as m]
    [malli.destructure :as md]))
 
-(def prefix-keys deft.core-shared/prefix-keys)
-
 
 (defmacro defp
   "Define a (defp) protocol, which is essentially just a list of multimethods.
