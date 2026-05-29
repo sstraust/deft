@@ -140,12 +140,7 @@
                                                 (:name (api/resolve &env class-name))
                                                 (resolve class-name)))) (name :keys))
             ~(into [] (remove
-                       (fn [x] (or (contains? skip-fields-set x)
-                                   (and (keyword? x)
-                                        (not (= (namespace (if (:ns &env)
-                                                             (:name (api/resolve &env class-name))
-                                                             (resolve class-name)))
-                                                (namespace x))))))
+              (fn [x] (contains? skip-fields-set x))
               class-fields))}
          ~var-name]
        ~@code)))
