@@ -24,7 +24,7 @@ org.clojars.sstraust/deft {:mvn/version "0.1.5"}
 - Records are not REPL friendly. If you redefine a method inside of a Clojure record, it does not take effect until that record is reinstantiated.
 - Records use single : keywords for field access, making programs difficult to refactor.
 - Defining a record method is cumbersome because it requires an interface, but it's the only way to automatically destructure the record's fields.
-- Leads to huge java-like class blocks in your programs. These are hard to manuever around, and don't let you do things like keep a method definition next to an assocaited macro definition, group related static helper functions, create let over lambdas, and generally give you the flexibility to organize a program the way you want.
+- Leads to huge java-like class blocks in your programs, because you have to implement the entirety of a protocol in one place. It doesn't let you do things like keep a method definition next to an assocaited macro definition, group related static helper functions, create let over lambdas, and generally give you the flexibility to organize a program the way you want.
 - Most people in the community recommend you use maps instead (when feasible).
 
 #### What's wrong with clojure maps (and multimethods)?
