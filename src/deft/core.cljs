@@ -3,4 +3,4 @@
   (:require-macros [deft.core]))
 
 (def get-deft-mutable-registry deft.core-shared/get-deft-mutable-registry-internal)
-(def use-deft-malli-registry! deft.core-shared/use-deft-malli-registry-internal!!)
+(def use-deft-malli-registry! deft.core-shared/use-deft-malli-registry-internal!)
