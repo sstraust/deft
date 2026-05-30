@@ -76,6 +76,8 @@ We go into detail on this in the defp section, but provide an example of the syn
    (area [this] (* pi radius radius)))
 ```
 
+it may be useful to turn on malli schema enforcement. see  [additional setup](#additional-setup)
+
 ##### Does this work in Clojurescript?
 Yes.
 
@@ -237,10 +239,63 @@ additionally, when you do ```(deft MyImplementation [] MyProtocol)```, ```::MyIm
 In defmethod, Circle is also the dispatch value, so it describes what *type* of thing you're defining, and is in some sense part of the _name_ of what you are trying to implement. In defnt, the fact that you're using Circle destructuring under the hood is an implementation detail, and so it belongs with the argument list (and after any docstrings). I know it seems strange to have two styles, but I thought long and hard about this, and decided this was the best approach for code readability, especially for scanning large existing files to see how they work.
 -->
 
-
+### Additional Setup
+the setup is following is useful, but not required.
 #### Copy clj-kondo deps
 ```clj-kondo --copy-configs --dependencies --lint "$(clojure -Spath)"```
 after installing this library, you may want to run this command to copy the clj-kondo config into your project.
+#### Make sure Malli is Enabled
+by default, Malli does not enforce schema checks. You have to explicitly turn it on to see any error-checking.
+
+Malli has detailed docs on how to do this, but for convenience i describe my setup below:
+##### in cljs projects
+I use shadow-cljs, and inside of shadow-cljs.edn, I set
+```
+:builds {:app
+          {
+           :devtools {
+--------->       :preloads [user
+                                 devtools.preload]
+                      }
+```
+devtools.preload (from binaryage/devtools) is not strictly necessary, but it gives you better error messages in the js console.
+
+Then inside of user.cljs, I do:
+```
+(ns user
+  {:dev/always true}
+  (:require   [malli.dev.cljs :as dev]
+              [my-project.core]
+              [deft.core]))
+
+
+(deft.core/use-deft-malli-registry!)
+(dev/start!)
+
+(.log js/console "starting malli dev")
+```
+where ```my-project.core``` is the main namespace of my project.
+##### in clj projects
+I add "user.clj" in my top-level src directory, (e.g. ```src/user.clj```)
+and then do
+```
+(ns user
+  (:require
+   [deft.core :as deft]
+   [malli.dev :as dev]
+   [malli.dev.pretty :as pretty]))
+
+
+(deft/use-deft-malli-registry!)
+(dev/start! {:report (pretty/thrower)})
+
+
+```
+
+note that this is more agressive enforcement than what most people use, but I enjoy the stability.
+
+
+
 
 
 ## Design Notes and Commentary
