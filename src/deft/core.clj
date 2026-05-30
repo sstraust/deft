@@ -260,10 +260,6 @@
                 ;; or maybe just like think really carefully about what this type is, and what it should represent
                 (cons :map
                       (concat (for [[field type] fields-to-types]
-                                (do
-                                  (def cc field)
-                                  (def c2 (is-namespaced-key? field))
-                                  (def c3 (name (str *ns*)))
                                 (cond
                                   (is-namespaced-key? field)
                                   [field type]
@@ -277,7 +273,7 @@
                                   (throw (Exception. "cannot use keyword field with same namespace as current. use symbol instead."))
 
                                   :else
-                                  (throw (Exception. "keyword fields must be namespaced. we may relax this restriction in the future.")))))
+                                  (throw (Exception. "keyword fields must be namespaced. we may relax this restriction in the future."))))
                               (when (not (contains? tagged-args :record-like))
                                 [[:type [:= type-name]]])))))
        
