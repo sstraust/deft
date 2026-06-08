@@ -9,6 +9,7 @@
    [clojure.pprint :as pprint]))
 
 (def malli-registry-atom (atom {}))
+(def always-instrument (atom false))
 
 #?(:clj
    (def-map-type TypeMap [m mta]
@@ -205,3 +206,6 @@
    (mr/composite-registry
     (m/default-schemas)
     (mr/mutable-registry malli-registry-atom))))
+
+(defn always-instrument! []
+  (reset! always-instrument true))

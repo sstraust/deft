@@ -1,7 +1,7 @@
 (ns deft.core
   (:require
    [cljs.analyzer.api :as api]
-   [deft.core-shared :refer :all]
+   [deft.core-shared :refer :all :exclude [always-instrument!]]
    [malli.core :as m]
    [malli.destructure :as md]))
 
@@ -293,7 +293,22 @@
        ~(when (contains? tagged-args :record-like)
          `(define-record-like-print-methods ~type-name))
 
-       (m/=> ~(symbol (str ">" (name class-name)))
+       
+       (if @deft.core-shared/always-instrument
+         (def ~(symbol (str ">" (name class-name)))
+            (m/-instrument {:schema [:=>
+                                     ;; TODO deduplicate with above
+                                     ~(into []
+                                            (cons :cat
+                                                  (mapcat identity
+                                                          (for [[field type] fields-to-types]
+                                                            [(if (is-namespaced-key? field)
+                                                               [:= field]
+                                                               [:= (keyword (str field))])
+                                                             type]))))
+                                     ~class-name]}
+                           ~(symbol (str ">" (name class-name)))))
+         (m/=> ~(symbol (str ">" (name class-name)))
              [:=>
               ;; TODO remove the order restriction once Malli improves
               ~(into []
@@ -304,7 +319,9 @@
                                               [:= field]
                                               [:= (keyword (str field))])
                                             type]))))
-              ~class-name]))))
+              ~class-name]))
+                           
+       )))
 
 
 
@@ -340,4 +357,6 @@
 
 (def get-deft-mutable-registry deft.core-shared/get-deft-mutable-registry-internal)
 (def use-deft-malli-registry! deft.core-shared/use-deft-malli-registry-internal!)
+;; warning!! this may enforce more things in the future
+(def always-instrument! deft.core-shared/always-instrument!)
 
