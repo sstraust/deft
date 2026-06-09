@@ -16,7 +16,7 @@ A collection of macros designed to address issues with objects in Clojure.
 ```
 
 #### Installation
-```
+```clojure
 org.clojars.sstraust/deft {:mvn/version "0.1.5"}
 ```
 [on youtube](https://www.youtube.com/watch?v=dlW6YzwUZ-M)
@@ -82,6 +82,29 @@ it may be useful to turn on malli schema enforcement. see  [additional setup](#a
 Yes.
 
 note: Currently the Malli schema for the constructor ```(>Circle :position [1 2] :radius 2)```, requires that the keys be passed in the same order they appear in deft (:position first, :radius second), due to limitations of the Malli framework (https://github.com/metosin/malli/issues/994, https://github.com/metosin/malli/issues/1003 )
+
+##### Externally Namespaced Keys
+this feature is only available on experimental, to use it you will need to set ```org.clojars.sstraust/deft {:mvn/version "experimental4"}```
+
+If you'd like one of the keys in your map to be from another namespace, you can do it like so:
+
+```clojure
+(deft Circle [::location/position radius])
+
+(>Circle ::location/position [1 2] :radius 12)
+```
+
+This is especially useful if you want to have a property that works the same way in several types.
+
+i.e. if you wanted to move several types of shapes to the left, you could do:
+
+```clojure
+(defn shift-left [shape amount]
+   (update-in shape [::location/position 0] - amount))
+```
+
+these keys are not destructured during automatic destructuring as below.
+
 
 #### witht
 A convenience tool for accessing the value inside of a deft.
@@ -204,6 +227,29 @@ creating a protocol via defp adds it to the project's malli registry, which you 
 For example, if you do ```(defp MyProtocol)```, it will add ```::MyProtocol``` to the malli registry, and be valid if the input type implements that protocol.
 
 additionally, when you do ```(deft MyImplementation [] MyProtocol)```, ```::MyImplementation``` derives from ```::MyProtocol```
+
+##### Externally Namespaced Keys
+You can also require that certain fields must be present in all implementations of a protocol.
+
+```clojure
+(defp Positioned :required-fields [::pos - ::Point])
+```
+
+
+It's useful because then you can build things that depend on this field
+
+```clojure
+(defp Gremlin :extends [location/Positioned])
+
+(defmethod game-object/get-hitbox ::Gremlin [self]
+  (js/Matter.Bodies.rectangle
+   (get-in self [::location/pos ::location/x])
+   (get-in self [::location/pos ::location/y])
+   15 15))
+```
+
+In particular, it prevents you from having the need to write getter and setter style declarations in protocol declarations in order to make everything work.
+
 
 
 <!-- !!!! TODO Actually add this feature!!! -->
