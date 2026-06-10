@@ -232,7 +232,7 @@ additionally, when you do ```(deft MyImplementation [] MyProtocol)```, ```::MyIm
 You can also require that certain fields must be present in all implementations of a protocol.
 
 ```clojure
-(defp Positioned :required-fields [::pos - ::Point])
+(defp Positioned :required-keys [::pos - ::Point])
 ```
 
 
