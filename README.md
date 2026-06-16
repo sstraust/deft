@@ -17,7 +17,7 @@ A collection of macros designed to address issues with objects in Clojure.
 
 #### Installation
 ```clojure
-org.clojars.sstraust/deft {:mvn/version "0.1.5"}
+org.clojars.sstraust/deft {:mvn/version "0.2.0"}
 ```
 [on youtube](https://www.youtube.com/watch?v=dlW6YzwUZ-M)
 #### What's wrong with records and protocols?
@@ -84,7 +84,7 @@ Yes.
 note: Currently the Malli schema for the constructor ```(>Circle :position [1 2] :radius 2)```, requires that the keys be passed in the same order they appear in deft (:position first, :radius second), due to limitations of the Malli framework (https://github.com/metosin/malli/issues/994, https://github.com/metosin/malli/issues/1003 )
 
 ##### Externally Namespaced Keys
-this feature is only available on experimental, to use it you will need to set ```org.clojars.sstraust/deft {:mvn/version "experimental4"}```
+
 
 If you'd like one of the keys in your map to be from another namespace, you can do it like so:
 
@@ -442,6 +442,9 @@ clj -X:deploy
 ```
 
 # ChangeLog
+0.2.0:
+- add namespaced keyword fields to defp and deft
+
 0.1.4:
 - add cljs file to improve experience of importing in clojurescript
 - add malli registry for protocols
