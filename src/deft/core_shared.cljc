@@ -137,7 +137,7 @@
 
 (defn prefix-keys [ns-name m]
   (let [prefix-fn (fn [k]
-                   (if (keyword? k)
+                   (if (and (keyword? k) (not (namespace k)))
                      (keyword (name ns-name) (name k))
                      k))]
     (reduce-kv (fn [acc k v]
@@ -163,8 +163,9 @@
     these methods. It's useful for checking that all of the methods are defined in the same place
     (and not sporadically). If its nil, then it does no extra filtering.
   "
-  [obj-type protocol & {:keys [available-methods]}]
+  [obj-type protocol & {:keys [available-methods available-fields]}]
   (let [available-methods (when available-methods (set available-methods))
+        available-fields (into {} available-fields)
         undefined-methods
         (into []
         (remove nil?
@@ -175,11 +176,22 @@
                                       (and available-methods
                                            (not (contains? available-methods multimethod))))
                               method-def))
-                     (:deft.core/implements-methods protocol))))]
-    (if (not (empty? undefined-methods))
+                     (:deft.core/implements-methods protocol))))
+        undefined-fields
+        (into [] (remove nil? (map
+         (fn [[field-name field-type]]
+           (when (not (= (get available-fields field-name) field-type))
+             field-name))
+         (:deft.core/required-keys protocol))))
+        ]
+        (if (or (not (empty? undefined-methods))
+                (not (empty? undefined-fields)))
+          (let [error-message-undefined-methods (when (not (empty? undefined-methods)) (str "methods " undefined-methods " is not defined for " obj-type " in protocol " protocol))
+                error-message-undefined-fields (when (not (empty? undefined-fields)) (str "fields " undefined-fields " is not defined with correct type for " obj-type "\n in protocol " protocol "\n available fields " available-fields ))
+                error-message (str error-message-undefined-methods "\n" error-message-undefined-fields)]
       #?(:clj
-         (throw (RuntimeException. (str "methods " undefined-methods " is not defined for " obj-type " in protocol " protocol)))
-         :cljs (throw (js/Error "failed")))
+         (throw (RuntimeException. error-message))
+         :cljs (throw (js/Error error-message))))
       true)))
 
 (defn get-deft-mutable-registry-internal
