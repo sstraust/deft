@@ -7,17 +7,19 @@
 
 (defn compute-fields-to-types [inp-fields-list]
   (into [] (loop [inp-list inp-fields-list
-                               outp-list []]
+                  outp-list []]
+             (let [keyword-args (take-while #(= % :optional) inp-list)
+                   inp-list (drop-while #(= % :optional) inp-list)]
                           (cond
                             (= (second inp-list) '-)
                             (if (< (count inp-list) 3)
                               (throw (Exception. "wrong number of arguments to type expression"))
-                              (recur (drop 3 inp-list) (concat outp-list [[(first inp-list) (nth inp-list 2)]])))
+                              (recur (drop 3 inp-list) (concat outp-list [[(first inp-list) (nth inp-list 2) (set keyword-args)]])))
 
                             (empty? inp-list)
                             outp-list
 
-                            :else (recur (drop 1 inp-list) (concat outp-list [[(first inp-list) :any]]))))))
+                            :else (recur (drop 1 inp-list) (concat outp-list [[(first inp-list) :any (set keyword-args)]])))))))
 
 (defmacro defp
   "Define a (defp) protocol, which is essentially just a list of multimethods.
@@ -80,7 +82,7 @@
            `(defmulti ~(symbol (str  (:name method))) (fn [~'this & ~'args] (or (:type ~'this) (type ~'this)))))
 
        (swap! deft.core-shared/malli-registry-atom assoc ~(keyword (name (str *ns*)) (name protocol-name))
-              [:fn (fn [x#] (isa? (:type x#) ~(keyword (name (str *ns*)) (name protocol-name))))])
+              [:fn (fn [x#] (isa? (or (:type x#) (type x#)) ~(keyword (name (str *ns*)) (name protocol-name))))])
        
        (def ~protocol-name
          (apply merge-with (fn [& args#]
@@ -100,7 +102,7 @@
                       `{::multimethod ~external-method
                         ::key-fn identity}))))
           ::name ~(keyword (name (str *ns*)) (name protocol-name))
-          ::required-keys ~(into {} (compute-fields-to-types (:required-keys opts)))}
+          ::required-keys ~(into {} (mapv #(into [] (take 2 %)) (compute-fields-to-types (:required-keys opts))))}
          (map #(select-keys % [::implements-methods ::required-keys]) ~(:extends opts)))))))
 
 
@@ -241,7 +243,7 @@
         fields-list (mapv first fields-to-types)
 
         tagged-args (set (take-while #(contains? #{:record-like} %) record-implementations))
-        keywords-args (take-while (comp keyword? first) (partition 2 record-implementations))
+        keywords-args (take-while (comp keyword? first) (partition 2 (drop (count tagged-args) record-implementations)))
         opts (into {} (into [] (map #(apply vector %) keywords-args)))
         record-implementations (drop (+ (count tagged-args) (* 2 (count keywords-args))) record-implementations)
         is-namespaced-key? (fn [field] (and (keyword? field)
@@ -259,7 +261,8 @@
                 ;; TODO define the output type as TYPEMAP when doing the record type
                 ;; or maybe just like think really carefully about what this type is, and what it should represent
                 (cons :map
-                      (concat (for [[field type] fields-to-types]
+                      (concat (for [[field type keyword-args] fields-to-types
+                                    :when (not (contains? keyword-args :optional))]
                                 (cond
                                   (is-namespaced-key? field)
                                   [field type]
@@ -299,11 +302,13 @@
               ~(into []
                            (cons :cat
                                  (mapcat identity
-                                         (for [[field type] fields-to-types]
-                                           [(if (is-namespaced-key? field)
-                                              [:= field]
-                                              [:= (keyword (str field))])
-                                            type]))))
+                                         (for [[field type keyword-args] fields-to-types]
+                                           (let [keyfield (if (is-namespaced-key? field)
+                                                            field
+                                                            (keyword (str field)))]
+                                             (if (contains? keyword-args :optional)
+                                               [[:? [:cat [:= keyfield] type]]]
+                                               [[:= keyfield] type]))))))
               ~class-name]))))
 
 

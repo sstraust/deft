@@ -37,8 +37,8 @@
     (deft Square [side-length - :double]
       Shape
       (area [this] (* side-length side-length)))
-    (let [sq (>Square :side-length 12)]
-      (is (= (area sq) 144))))
+    (let [sq (>Square :side-length 12.0)]
+      (is (= (area sq) 144.0))))
 
   (testing
       "test that creating a type that does not fully implement a protocol fails"
