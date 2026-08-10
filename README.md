@@ -449,7 +449,6 @@ Soon to be Released:
 
 0.2.0:
 - add namespaced keyword fields to defp and deft
-- add utility for 'always-instrument!' for deft creation
 
 0.1.4:
 - add cljs file to improve experience of importing in clojurescript
