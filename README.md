@@ -444,6 +444,8 @@ clj -X:deploy
 # ChangeLog
 Soon to be Released:
 - add support for optional fields
+- add utility for 'always-instrument!' for deft creation (needs verification)
+- fixes to clj-kondo config
 
 0.2.0:
 - add namespaced keyword fields to defp and deft
