@@ -199,7 +199,7 @@ you can do
   (say-hi [this]))
   
 (ns my-ns2
-  (:requires my-ns1))
+  (:require my-ns1))
 (deft MyType []
    my-ns1/MyProtocol
    (say-hi [this] "hi"))
@@ -210,7 +210,7 @@ If you want to implement a method that is defined externally to the protocol, yo
 (defp MyProtocol
    :external-methods [draw-stuff/draw])
    
-(deft MyImpl
+(deft MyImpl []
    MyProtocol
    (draw-stuff/draw [this] (draw this)))
 ```
@@ -442,6 +442,9 @@ clj -X:deploy
 ```
 
 # ChangeLog
+Soon to be Released:
+- add support for optional fields
+
 0.2.0:
 - add namespaced keyword fields to defp and deft
 
