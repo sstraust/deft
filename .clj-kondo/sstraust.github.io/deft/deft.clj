@@ -210,6 +210,6 @@
             (when attr-map [attr-map])
             [params]
             (when conds [conds])
-            [`(~'witht [~obj-type ~(first params)]
+            [`(~'deft.core/witht [~obj-type ~(first params)]
                ~@rest-of-body)]
             ))))
