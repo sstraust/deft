@@ -310,35 +310,26 @@
        ~(when (contains? tagged-args :record-like)
          `(define-record-like-print-methods ~type-name))
 
-       
-       (if @deft.core-shared/always-instrument
-         (def ~(symbol (str ">" (name class-name)))
-            (m/-instrument {:schema [:=>
-                                     ;; TODO deduplicate with above
-                                     ~(into []
-                                            (cons :cat
-                                                  (mapcat identity
-                                                          (for [[field type] fields-to-types]
-                                                            [(if (is-namespaced-key? field)
-                                                               [:= field]
-                                                               [:= (keyword (str field))])
-                                                             type]))))
-                                     ~class-name]}
-                           ~(symbol (str ">" (name class-name)))))
-         (m/=> ~(symbol (str ">" (name class-name)))
-             [:=>
-              ;; TODO remove the order restriction once Malli improves
-              ~(into []
-                           (cons :cat
-                                 (mapcat identity
-                                         (for [[field type keyword-args] fields-to-types]
-                                           (let [keyfield (if (is-namespaced-key? field)
-                                                            field
-                                                            (keyword (str field)))]
-                                             (if (contains? keyword-args :optional)
-                                               [[:? [:cat [:= keyfield] type]]]
-                                               [[:= keyfield] type]))))))
-              ~class-name])))))
+
+       (let [function-schema [:=>
+                              ;; TODO remove the order restriction once Malli improves
+                              ~(into []
+                                     (cons :cat
+                                           (mapcat identity
+                                                   (for [[field type keyword-args] fields-to-types]
+                                                     (let [keyfield (if (is-namespaced-key? field)
+                                                                      field
+                                                             (keyword (str field)))]
+                                                       (if (contains? keyword-args :optional)
+                                                         [[:? [:cat [:= keyfield] type]]]
+                                                         [[:= keyfield] type]))))))
+                              ~class-name]]
+         (if @deft.core-shared/always-instrument
+           (def ~(symbol (str ">" (name class-name)))
+             (m/-instrument {:schema function-schema}
+                            ~(symbol (str ">" (name class-name)))))
+           (m/=> ~(symbol (str ">" (name class-name)))
+                 function-schema))))))
 
 
 
@@ -376,3 +367,4 @@
 (def use-deft-malli-registry! deft.core-shared/use-deft-malli-registry-internal!)
 ;; warning!! this may enforce more things in the future
 (def always-instrument! deft.core-shared/always-instrument!)
+
