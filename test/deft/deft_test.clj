@@ -5,7 +5,8 @@
    [deft.core-shared :as core-shared]
    [deft.deftest-external-ns-helper :as deftest-external-ns-helper]
    [malli.core]
-   [malli.instrument :as mi]))
+   [malli.instrument :as mi])
+  (:import clojure.lang.Compiler))
 
 
 
@@ -37,8 +38,8 @@
     (deft Square [side-length - :double]
       Shape
       (area [this] (* side-length side-length)))
-    (let [sq (>Square :side-length 12)]
-      (is (= (area sq) 144))))
+    (let [sq (>Square :side-length 12.0)]
+      (is (= (area sq) 144.0))))
 
   (testing
       "test that creating a type that does not fully implement a protocol fails"
@@ -786,6 +787,39 @@
 ;;       define equality for this relation. maybe ignore this thing for now
 
 
+
+;; Test 34
+(deftest optional-fields-test ^:api-spec
+  (testing "test that this will work with optional fields"
+    (deft Circle44 [:optional height - :double])
+    (is (= (>Circle44) {:type :deft.deft-test/Circle44}))
+    (is (= (>Circle44 :height 12) {:deft.deft-test/height 12, :type :deft.deft-test/Circle44})))
+  (testing "test that this will work with mixed optional and non-optional fields"
+    (deft Circle44_1 [position - :double
+                      :optional height - :double])
+    (is (= (>Circle44_1 :position 12) {:deft.deft-test/position 12, :type :deft.deft-test/Circle44_1}))
+    (is (= (>Circle44_1 :position 12 :height 9)
+           {:deft.deft-test/position 12, :deft.deft-test/height 9, :type :deft.deft-test/Circle44_1}))
+    (mi/instrument!)
+    (is (thrown? clojure.lang.ExceptionInfo
+                 (>Circle44_1)))
+    (is (thrown? clojure.lang.ExceptionInfo
+                 (>Circle44_1 :height 12))))
+
+  (testing "test that it throws an exception when no optional field is supplied"
+    (is (thrown? clojure.lang.Compiler$CompilerException (eval  '(deft Circle44_2 [:optional])))))
+
+  (testing "test that it is ok to supply an optional without a type definition"
+    ;; can optionals satisfy protocols with required keys?
+    (deft Circle44_2 [:optional height])
+    (is (= (>Circle44_2 :height 12)
+           {:deft.deft-test/height 12, :type :deft.deft-test/Circle44_2}))
+    (is (thrown? clojure.lang.ExceptionInfo
+                 (>Circle44_1)))
+
+    (is (thrown?  clojure.lang.Compiler$CompilerException
+                 (eval '(deft Circle44_2 [:optional :pos]))))))
+      
 
 
 

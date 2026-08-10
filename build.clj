@@ -3,7 +3,7 @@
 
 
 (def lib 'sstraust/deft)
-(def version "experimental")
+(def version "0.2.0")
 (def class-dir "target/classes")
 (def jar-file (format "target/%s-%s.jar" (name lib) version))
 

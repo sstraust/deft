@@ -16,15 +16,15 @@ A collection of macros designed to address issues with objects in Clojure.
 ```
 
 #### Installation
-```
-org.clojars.sstraust/deft {:mvn/version "0.1.5"}
+```clojure
+org.clojars.sstraust/deft {:mvn/version "0.2.0"}
 ```
 [on youtube](https://www.youtube.com/watch?v=dlW6YzwUZ-M)
 #### What's wrong with records and protocols?
 - Records are not REPL friendly. If you redefine a method inside of a Clojure record, it does not take effect until that record is reinstantiated.
 - Records use single : keywords for field access, making programs difficult to refactor.
 - Defining a record method is cumbersome because it requires an interface, but it's the only way to automatically destructure the record's fields.
-- Leads to huge java-like class blocks in your programs. These are hard to manuever around, and don't let you do things like keep a method definition next to an assocaited macro definition, group related static helper functions, create let over lambdas, and generally give you the flexibility to organize a program the way you want.
+- Leads to huge java-like class blocks in your programs, because you have to implement the entirety of a protocol in one place. It doesn't let you do things like keep a method definition next to an assocaited macro definition, group related static helper functions, create let over lambdas, and generally give you the flexibility to organize a program the way you want.
 - Most people in the community recommend you use maps instead (when feasible).
 
 #### What's wrong with clojure maps (and multimethods)?
@@ -76,10 +76,35 @@ We go into detail on this in the defp section, but provide an example of the syn
    (area [this] (* pi radius radius)))
 ```
 
+it may be useful to turn on malli schema enforcement. see  [additional setup](#additional-setup)
+
 ##### Does this work in Clojurescript?
 Yes.
 
 note: Currently the Malli schema for the constructor ```(>Circle :position [1 2] :radius 2)```, requires that the keys be passed in the same order they appear in deft (:position first, :radius second), due to limitations of the Malli framework (https://github.com/metosin/malli/issues/994, https://github.com/metosin/malli/issues/1003 )
+
+##### Externally Namespaced Keys
+
+
+If you'd like one of the keys in your map to be from another namespace, you can do it like so:
+
+```clojure
+(deft Circle [::location/position radius])
+
+(>Circle ::location/position [1 2] :radius 12)
+```
+
+This is especially useful if you want to have a property that works the same way in several types.
+
+i.e. if you wanted to move several types of shapes to the left, you could do:
+
+```clojure
+(defn shift-left [shape amount]
+   (update-in shape [::location/position 0] - amount))
+```
+
+these keys are not destructured during automatic destructuring as below.
+
 
 #### witht
 A convenience tool for accessing the value inside of a deft.
@@ -174,7 +199,7 @@ you can do
   (say-hi [this]))
   
 (ns my-ns2
-  (:requires my-ns1))
+  (:require my-ns1))
 (deft MyType []
    my-ns1/MyProtocol
    (say-hi [this] "hi"))
@@ -185,7 +210,7 @@ If you want to implement a method that is defined externally to the protocol, yo
 (defp MyProtocol
    :external-methods [draw-stuff/draw])
    
-(deft MyImpl
+(deft MyImpl []
    MyProtocol
    (draw-stuff/draw [this] (draw this)))
 ```
@@ -202,6 +227,29 @@ creating a protocol via defp adds it to the project's malli registry, which you 
 For example, if you do ```(defp MyProtocol)```, it will add ```::MyProtocol``` to the malli registry, and be valid if the input type implements that protocol.
 
 additionally, when you do ```(deft MyImplementation [] MyProtocol)```, ```::MyImplementation``` derives from ```::MyProtocol```
+
+##### Externally Namespaced Keys
+You can also require that certain fields must be present in all implementations of a protocol.
+
+```clojure
+(defp Positioned :required-keys [::pos - ::Point])
+```
+
+
+It's useful because then you can build things that depend on this field
+
+```clojure
+(defp Gremlin :extends [location/Positioned])
+
+(defmethod game-object/get-hitbox ::Gremlin [self]
+  (js/Matter.Bodies.rectangle
+   (get-in self [::location/pos ::location/x])
+   (get-in self [::location/pos ::location/y])
+   15 15))
+```
+
+In particular, it prevents you from having the need to write getter and setter style declarations in protocol declarations in order to make everything work.
+
 
 
 <!-- !!!! TODO Actually add this feature!!! -->
@@ -237,10 +285,63 @@ additionally, when you do ```(deft MyImplementation [] MyProtocol)```, ```::MyIm
 In defmethod, Circle is also the dispatch value, so it describes what *type* of thing you're defining, and is in some sense part of the _name_ of what you are trying to implement. In defnt, the fact that you're using Circle destructuring under the hood is an implementation detail, and so it belongs with the argument list (and after any docstrings). I know it seems strange to have two styles, but I thought long and hard about this, and decided this was the best approach for code readability, especially for scanning large existing files to see how they work.
 -->
 
-
+### Additional Setup
+the setup is following is useful, but not required.
 #### Copy clj-kondo deps
 ```clj-kondo --copy-configs --dependencies --lint "$(clojure -Spath)"```
 after installing this library, you may want to run this command to copy the clj-kondo config into your project.
+#### Make sure Malli is Enabled
+by default, Malli does not enforce schema checks. You have to explicitly turn it on to see any error-checking.
+
+Malli has detailed docs on how to do this, but for convenience i describe my setup below:
+##### in cljs projects
+I use shadow-cljs, and inside of shadow-cljs.edn, I set
+```
+:builds {:app
+          {
+           :devtools {
+--------->       :preloads [user
+                                 devtools.preload]
+                      }
+```
+devtools.preload (from binaryage/devtools) is not strictly necessary, but it gives you better error messages in the js console.
+
+Then inside of user.cljs, I do:
+```
+(ns user
+  {:dev/always true}
+  (:require   [malli.dev.cljs :as dev]
+              [my-project.core]
+              [deft.core]))
+
+
+(deft.core/use-deft-malli-registry!)
+(dev/start!)
+
+(.log js/console "starting malli dev")
+```
+where ```my-project.core``` is the main namespace of my project.
+##### in clj projects
+I add "user.clj" in my top-level src directory, (e.g. ```src/user.clj```)
+and then do
+```
+(ns user
+  (:require
+   [deft.core :as deft]
+   [malli.dev :as dev]
+   [malli.dev.pretty :as pretty]))
+
+
+(deft/use-deft-malli-registry!)
+(dev/start! {:report (pretty/thrower)})
+
+
+```
+
+note that this is more agressive enforcement than what most people use, but I enjoy the stability.
+
+
+
 
 
 ## Design Notes and Commentary
@@ -341,6 +442,12 @@ clj -X:deploy
 ```
 
 # ChangeLog
+Soon to be Released:
+- add support for optional fields
+
+0.2.0:
+- add namespaced keyword fields to defp and deft
+
 0.1.4:
 - add cljs file to improve experience of importing in clojurescript
 - add malli registry for protocols
