@@ -311,7 +311,7 @@
          `(define-record-like-print-methods ~type-name))
 
 
-       (let [function-schema [:=>
+       (let [function-schema# [:=>
                               ;; TODO remove the order restriction once Malli improves
                               ~(into []
                                      (cons :cat
@@ -326,10 +326,10 @@
                               ~class-name]]
          (if @deft.core-shared/always-instrument
            (def ~(symbol (str ">" (name class-name)))
-             (m/-instrument {:schema function-schema}
+             (m/-instrument {:schema function-schema#}
                             ~(symbol (str ">" (name class-name)))))
            (m/=> ~(symbol (str ">" (name class-name)))
-                 function-schema))))))
+                 function-schema#))))))
 
 
 
