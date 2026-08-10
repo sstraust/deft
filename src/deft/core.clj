@@ -266,24 +266,33 @@
                 ;; TODO define the output type as TYPEMAP when doing the record type
                 ;; or maybe just like think really carefully about what this type is, and what it should represent
                 (cons :map
-                      (concat (for [[field type keyword-args] fields-to-types
-                                    :when (not (contains? keyword-args :optional))]
-                                (cond
-                                  (is-namespaced-key? field)
-                                  [field type]
-
-                                  (symbol? field)
-                                  [(keyword (str *ns*) (str field)) type]
-
-                                  (and (keyword? field)
-                                       (namespace field)
-                                       (= (namespace field) (name (str *ns*))))
-                                  (throw (Exception. "cannot use keyword field with same namespace as current. use symbol instead."))
-
-                                  :else
-                                  (throw (Exception. "keyword fields must be namespaced. we may relax this restriction in the future."))))
-                              (when (not (contains? tagged-args :record-like))
-                                [[:type [:= type-name]]])))))
+                      (concat
+                       (for [[field type keyword-args] fields-to-types
+                             ;; Currently optionals are FULLY removed from the map
+                             ;; which is bad because you want optional keys to
+                             ;; still do validation on type if they are supplied
+                             ]
+                         (let [field-keyword (cond
+                                               (is-namespaced-key? field)
+                                               field
+                                               
+                                              
+                                               (symbol? field)
+                                               (keyword (str *ns*) (str field))
+                                              
+                                              (and (keyword? field)
+                                                   (namespace field)
+                                                   (= (namespace field) (name (str *ns*))))
+                                              (throw (Exception. "cannot use keyword field with same namespace as current. use symbol instead."))
+                                              
+                                              :else
+                                              (throw (Exception. "keyword fields must be namespaced. we may relax this restriction in the future.")))]
+                           (if (contains? keyword-args :optional)
+                             [field-keyword {:optional true} type]
+                             [field-keyword type])
+                           ))
+                           (when (not (contains? tagged-args :record-like))
+                             [[:type [:= type-name]]])))))
        
        (defn ~(symbol (str ">" (name class-name))) [& {:as ~'args-list}]
          ~(if (contains? tagged-args :record-like)

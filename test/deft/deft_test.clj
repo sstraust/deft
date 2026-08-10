@@ -815,5 +815,11 @@
     (is (= (>Circle44_2 :height 12)
            {:deft.deft-test/height 12, :type :deft.deft-test/Circle44_2}))
     (is (thrown? clojure.lang.ExceptionInfo
-                 (>Circle44_1)))))
+                 (>Circle44_1)))
+
+    (is (thrown?  clojure.lang.Compiler$CompilerException
+                 (eval '(deft Circle44_2 [:optional :pos]))))))
       
+
+
+
