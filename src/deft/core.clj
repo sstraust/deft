@@ -16,6 +16,11 @@
                               (throw (Exception. "wrong number of arguments to type expression"))
                               (recur (drop 3 inp-list) (concat outp-list [[(first inp-list) (nth inp-list 2) (set keyword-args)]])))
 
+                            (and (empty? inp-list) (not (empty? keyword-args)))
+                            (throw (IllegalArgumentException.
+                                    (str "User supplied a keyword arg " (str (into [] keyword-args ))
+                                         " without a corresponding field name")))
+
                             (empty? inp-list)
                             outp-list
 
