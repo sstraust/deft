@@ -790,21 +790,22 @@
 
 ;; Test 34
 (deftest optional-fields-test ^:api-spec
+  (reset! core-shared/always-instrument true)
   (testing "test that this will work with optional fields"
     (deft Circle44 [:optional height - :double])
     (is (= (>Circle44) {:type :deft.deft-test/Circle44}))
-    (is (= (>Circle44 :height 12) {:deft.deft-test/height 12, :type :deft.deft-test/Circle44})))
+    (is (= (>Circle44 :height 12.0) {:deft.deft-test/height 12.0, :type :deft.deft-test/Circle44})))
   (testing "test that this will work with mixed optional and non-optional fields"
     (deft Circle44_1 [position - :double
                       :optional height - :double])
-    (is (= (>Circle44_1 :position 12) {:deft.deft-test/position 12, :type :deft.deft-test/Circle44_1}))
-    (is (= (>Circle44_1 :position 12 :height 9)
-           {:deft.deft-test/position 12, :deft.deft-test/height 9, :type :deft.deft-test/Circle44_1}))
+    (is (= (>Circle44_1 :position 12.0) {:deft.deft-test/position 12.0, :type :deft.deft-test/Circle44_1}))
+    (is (= (>Circle44_1 :position 12.0 :height 9.0)
+           {:deft.deft-test/position 12.0, :deft.deft-test/height 9.0, :type :deft.deft-test/Circle44_1}))
     (mi/instrument!)
     (is (thrown? clojure.lang.ExceptionInfo
                  (>Circle44_1)))
     (is (thrown? clojure.lang.ExceptionInfo
-                 (>Circle44_1 :height 12))))
+                 (>Circle44_1 :height 12.0))))
 
   (testing "test that it throws an exception when no optional field is supplied"
     (is (thrown? clojure.lang.Compiler$CompilerException (eval  '(deft Circle44_2 [:optional])))))
@@ -812,14 +813,30 @@
   (testing "test that it is ok to supply an optional without a type definition"
     ;; can optionals satisfy protocols with required keys?
     (deft Circle44_2 [:optional height])
-    (is (= (>Circle44_2 :height 12)
-           {:deft.deft-test/height 12, :type :deft.deft-test/Circle44_2}))
+    (is (= (>Circle44_2 :height 12.0)
+           {:deft.deft-test/height 12.0, :type :deft.deft-test/Circle44_2}))
     (is (thrown? clojure.lang.ExceptionInfo
                  (>Circle44_1)))
 
     (is (thrown?  clojure.lang.Compiler$CompilerException
-                 (eval '(deft Circle44_2 [:optional :pos]))))))
-      
+                  (eval '(deft Circle44_2 [:optional :pos])))))
+  (reset! core-shared/always-instrument false))
 
 
-
+(deftest test-always-instrument
+  (testing "test that always-instrument! always instruments the malli schema"
+    (reset! core-shared/always-instrument false)
+    (deft Circle45_1 [height - :double])
+    ;; it does not instrument without always instrument turned on
+    (is (= (>Circle45_1 :height "wowza")
+           {:deft.deft-test/height "wowza", :type :deft.deft-test/Circle45_1}))
+    (deft.core/always-instrument!)
+    (deft Circle45_2 [height - :double])
+    (is (thrown?
+         clojure.lang.ExceptionInfo
+         (>Circle45_2 :height "wowza")))
+    (reset! core-shared/always-instrument false)))
+         
+           
+           
+    
