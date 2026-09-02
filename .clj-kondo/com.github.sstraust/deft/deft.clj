@@ -76,6 +76,25 @@
 ;; begin spicy macros
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn compute-fields-to-types [inp-fields-list]
+  (into [] (loop [inp-list inp-fields-list
+                  outp-list []]
+             (let [keyword-args (take-while #(= % :optional) inp-list)
+                   inp-list (drop-while #(= % :optional) inp-list)]
+                          (cond
+                            (= (second inp-list) '-)
+                            (if (< (count inp-list) 3)
+                              nil
+                              (recur (drop 3 inp-list) (concat outp-list [[(first inp-list) (nth inp-list 2) (set keyword-args)]])))
+
+                            (and (empty? inp-list) (not (empty? keyword-args)))
+                            nil
+
+                            (empty? inp-list)
+                            outp-list
+
+                            :else (recur (drop 1 inp-list) (concat outp-list [[(first inp-list) :any (set keyword-args)]])))))))
+
 (defmacro defp [protocol-name & opts+sigs]
   (let [iname (symbol (str (munge (namespace-munge *ns*)) "." (munge name)))
         [opts sigs]
@@ -154,10 +173,11 @@
 (defmacro witht [def-list & code]
   (let [[class-name var-name] def-list]
     `(let [{~(keyword (namespace (symbol (simple-resolve class-name))) (name :keys))
-            ~(get @defc-fields-map
+            ~(filterv symbol?
+                      (get @defc-fields-map
                       ;; does this happen at read time?
                       ;; you have to be careful with the resolves
-                      (symbol (simple-resolve class-name)))}
+                           (symbol (simple-resolve class-name))))}
          ~var-name]
        ~@code)))
 
@@ -179,7 +199,7 @@
   (swap!  defc-fields-map
           assoc
           (symbol (str *ns*) (name class-name))
-          fields-list)
+          (mapv first (compute-fields-to-types fields-list)))
   `(do
      (def ~class-name "nil")
      (defn ~(symbol (str ">" (name class-name))) [& {:as args#}]
@@ -210,6 +230,6 @@
             (when attr-map [attr-map])
             [params]
             (when conds [conds])
-            [`(~'witht [~obj-type ~(first params)]
+            [`(~'deft.core/witht [~obj-type ~(first params)]
                ~@rest-of-body)]
             ))))
