@@ -17,7 +17,7 @@ A collection of macros designed to address issues with objects in Clojure.
 
 #### Installation
 ```clojure
-org.clojars.sstraust/deft {:mvn/version "0.2.0"}
+org.clojars.sstraust/deft {:mvn/version "0.2.1"}
 ```
 [on youtube](https://www.youtube.com/watch?v=dlW6YzwUZ-M)
 #### What's wrong with records and protocols?
@@ -104,6 +104,17 @@ i.e. if you wanted to move several types of shapes to the left, you could do:
 ```
 
 these keys are not destructured during automatic destructuring as below.
+
+##### Optional fields
+If you'd like a field to be optional, mark it with ```:optional```.
+For example:
+```clojure
+
+(deft Circle [:optional height - :double])
+
+(>Circle :height 12.0)
+(>Circle)
+```
 
 
 #### witht
@@ -316,11 +327,14 @@ Then inside of user.cljs, I do:
 
 
 (deft.core/use-deft-malli-registry!)
+(deft.core/always-instrument!)
 (dev/start!)
 
 (.log js/console "starting malli dev")
 ```
 where ```my-project.core``` is the main namespace of my project.
+
+
 ##### in clj projects
 I add "user.clj" in my top-level src directory, (e.g. ```src/user.clj```)
 and then do
@@ -333,6 +347,7 @@ and then do
 
 
 (deft/use-deft-malli-registry!)
+(deft/always-instrument!)
 (dev/start! {:report (pretty/thrower)})
 
 
@@ -442,7 +457,7 @@ clj -X:deploy
 ```
 
 # ChangeLog
-Soon to be Released:
+0.2.1:
 - add support for optional fields
 - add utility for 'always-instrument!' for deft creation
 - fixes to clj-kondo config
