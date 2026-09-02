@@ -47,11 +47,11 @@ Yes. The syntax looks like defprotocol and defrecord, so if you know how to use 
 ## Key Features
 
 - [deft](#deft)
-  - [Externally Namespaced Keys](#externally-namespaced-keys)
-  - [Optional Fields](#optional-fields)
+  - [externally namespaced keys](#externally-namespaced-keys)
+  - [optional fields](#optional-fields)
 - [witht](#witht)
 - [defp](#defp)
-- [Additional Setup](#additional-setup)
+- [additional setup](#additional-setup)
   - [clj-kondo deps](#copy-clj-kondo-deps)
   - [make sure malli is enabled](#make-sure-malli-is-enabled)
 
