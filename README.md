@@ -459,7 +459,7 @@ clj -X:deploy
 # ChangeLog
 0.2.1:
 - add support for optional fields
-- add utility for 'always-instrument!' for deft creation (needs verification)
+- add utility for 'always-instrument!' for deft creation
 - fixes to clj-kondo config
 
 0.2.0:
